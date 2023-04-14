@@ -7,7 +7,7 @@
     },
     "content_scripts": [
         {
-            "matches": ["*://connect.trezor.io/9/popup.html"],
+            "matches": ["https://localhost:8088/popup.html"],
             "js": ["./vendor/trezor-content-script.js"]
         }
     ]

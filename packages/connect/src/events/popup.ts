@@ -63,6 +63,10 @@ export type PopupEvent =
           type: typeof POPUP.LOADED | typeof POPUP.CANCEL_POPUP_REQUEST;
           payload?: typeof undefined;
       }
+    | {
+          type: typeof POPUP.CANCEL_POPUP_REQUEST;
+          payload?: { interruptionType: 'device-disconnected' } | undefined;
+      }
     | PopupInit
     | PopupHandshake
     | PopupError

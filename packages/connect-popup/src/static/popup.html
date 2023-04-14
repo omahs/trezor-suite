@@ -23,8 +23,8 @@
     </head>
     <body>
         <main>
-            <!-- 
-                give react slot min-width of left panel (InfoPanel) which is not 
+            <!--
+                give react slot min-width of left panel (InfoPanel) which is not
                 loaded yet to prevent loader from "jumping"
              -->
             <div id="react" style="min-width: 35vw"></div>
@@ -3214,6 +3214,16 @@
                 </div>
             </div>
             <!-- Passphrase on device: END -->
+
+            <!-- Error -->
+            <div class="error">
+                <p>Error</p>
+                <p>Bla bla bla</p>
+                <div class="buttons">
+                    <button class="confirm" onclick="window.closeWindow();">Close</button>
+                </div>
+            </div>
+            <!-- Error: END -->
 
             <!-- Iframe not loading failure start-->
             <!-- moved into @trezor/connect-ui -->

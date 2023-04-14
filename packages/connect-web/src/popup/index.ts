@@ -107,6 +107,7 @@ export class PopupManager extends EventEmitter {
 
         this.closeInterval = window.setInterval(() => {
             if (!this._window) return;
+            // TODO(karliatto): make this instead of closing display error in popup
             if (this.settings.env === 'webextension') {
                 chrome.tabs.get(this._window.id, tab => {
                     if (!tab) {
@@ -245,6 +246,9 @@ export class PopupManager extends EventEmitter {
     }
 
     handleMessage(message: MessageEvent) {
+        console.log('handleMessage in connect-web popup PopupManager');
+        console.log('message', message);
+        console.log('message.data.type', message.data.type);
         // ignore messages from domain other then popup origin and without data
         // const data: CoreMessage = message.data;
         const { data } = message;
@@ -281,6 +285,7 @@ export class PopupManager extends EventEmitter {
             // note this settings and iframe.ConnectSettings could be different (especially: origin, popup, webusb, debug)
             // now popup is able to load assets
         } else if (data.type === POPUP.CANCEL_POPUP_REQUEST || data.type === UI.CLOSE_UI_WINDOW) {
+            // TODO: why not instead of closing it from 3rd party we could send a message to popup so error is display there.
             this.close();
         }
     }
@@ -315,6 +320,7 @@ export class PopupManager extends EventEmitter {
         }
 
         if (this._window) {
+            console.log('this.settings.env', this.settings.env);
             if (this.settings.env === 'webextension') {
                 // @ts-expect-error
                 let _e = chrome.runtime.lastError;
@@ -323,13 +329,15 @@ export class PopupManager extends EventEmitter {
                     _e = chrome.runtime.lastError;
                 });
             } else {
-                this._window.close();
+                console.log('it should be closing from connect-web popup');
+                // this._window.close();
             }
             this._window = null;
         }
     }
 
     async postMessage(message: CoreMessage) {
+        console.log('postMessage in popupmanager');
         // device needs interaction but there is no popup/ui
         // maybe popup request wasn't handled
         // ignore "ui_request_window" type

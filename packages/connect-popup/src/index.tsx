@@ -27,6 +27,8 @@ import { isPhishingDomain } from './utils/isPhishingDomain';
 
 let handshakeTimeout: ReturnType<typeof setTimeout>;
 
+// TODO(karliatto): it would be nice to consider all the popup closing scenarios packages/connect-popup/e2e/tests/popup-close.test.ts
+
 // browser built-in functionality to quickly and safely escape the string
 const escapeHtml = (payload: any) => {
     if (!payload) return;
@@ -41,9 +43,12 @@ const escapeHtml = (payload: any) => {
 
 // handle messages from window.opener and iframe
 const handleMessage = (event: MessageEvent<PopupEvent | UiEvent>) => {
+    console.log('handleMessage connect-popup');
+    console.log('event', event);
     const { data } = event;
 
     if (!data) return;
+    console.log('data.type', data.type);
 
     // This is message from the window.opener
     if (data.type === POPUP.INIT) {
@@ -53,6 +58,17 @@ const handleMessage = (event: MessageEvent<PopupEvent | UiEvent>) => {
 
     // This is message from the window.opener
     if (data.type === UI_REQUEST.IFRAME_FAILURE) {
+        reactEventBus.dispatch({
+            type: 'error',
+            detail: 'iframe-failure',
+        });
+
+        return;
+    }
+
+    if (data.type === POPUP.CANCEL_POPUP_REQUEST) {
+        // show it
+        console.log('showing it!!!');
         reactEventBus.dispatch({
             type: 'error',
             detail: 'iframe-failure',
@@ -106,6 +122,11 @@ const handleMessage = (event: MessageEvent<PopupEvent | UiEvent>) => {
     reactEventBus.dispatch();
 
     switch (message.type) {
+        // case POPUP.CANCEL_POPUP_REQUEST:
+        //     // TODO(karliatto): add new error view;
+        //     console.log('here we should display error screen');
+        //     showView('error');
+        //     break;
         case UI_REQUEST.LOADING:
             // case UI.REQUEST_UI_WINDOW :
             showView('loader');
@@ -203,9 +224,12 @@ const init = async (payload: PopupInit['payload']) => {
 
 // handle POPUP.HANDSHAKE message from iframe
 const handshake = (handshake: PopupHandshake) => {
+    console.log('handshake in connect-popup', handshake);
     const { payload } = handshake;
     if (!payload) return;
 
+    console.log('payload', payload);
+    console.log('clearing Timeout handshake connect-popup');
     clearTimeout(handshakeTimeout);
 
     // use trusted settings from iframe
@@ -233,20 +257,21 @@ const handshake = (handshake: PopupHandshake) => {
 };
 
 const onLoad = () => {
+    console.log('onLoad in connect-popup');
     postMessageToParent(createPopupMessage(POPUP.LOADED));
 
-    handshakeTimeout = setTimeout(
-        () =>
-            reactEventBus.dispatch({
-                type: 'error',
-                detail: 'handshake-timeout',
-            }),
+    handshakeTimeout = setTimeout(() => {
+        console.log('handshake-timeout connect-popup');
+        reactEventBus.dispatch({
+            type: 'error',
+            detail: 'handshake-timeout',
+        });
         // in theory, a user might have extremely slow internet connection and handshake
         // could be done after this is fired. the question is, should we disallow communication
         // after error screen has been rendered? maybe it would be better to keep loader loading
         // and display some kind of modal instead
-        90 * 1000,
-    );
+    }, 1000);
+    // }, 90 * 1000);
 };
 
 window.addEventListener('load', onLoad, false);
@@ -255,8 +280,9 @@ window.addEventListener('message', handleMessage, false);
 // global method used in html-inline elements
 // @ts-expect-error not defined in window
 window.closeWindow = () => {
+    console.log('window.closeWindow in connect-popup');
     setTimeout(() => {
-        window.postMessage({ type: POPUP.CLOSE_WINDOW }, window.location.origin);
-        window.close();
+        // window.postMessage({ type: POPUP.CLOSE_WINDOW }, window.location.origin);
+        // window.close();
     }, 100);
 };

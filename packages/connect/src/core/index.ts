@@ -281,6 +281,7 @@ const initDevice = async (method: AbstractMethod) => {
  * @memberof Core
  */
 export const onCall = async (message: CoreMessage) => {
+    console.log('onCall in connect core');
     if (!message.id || !message.payload || message.type !== IFRAME.CALL) {
         throw ERRORS.TypedError(
             'Method_InvalidParameter',
@@ -323,6 +324,7 @@ export const onCall = async (message: CoreMessage) => {
                 await getPopupPromise().promise;
             } else {
                 // cancel popup request
+                console.log('cancel popup request in connect core');
                 postMessage(createPopupMessage(POPUP.CANCEL_POPUP_REQUEST));
             }
             const response = await method.run();
@@ -354,6 +356,7 @@ export const onCall = async (message: CoreMessage) => {
     try {
         device = await initDevice(method);
     } catch (error) {
+        console.log('error in connect core', error);
         if (error.code === 'Transport_Missing') {
             // wait for popup handshake
             await getPopupPromise().promise;
@@ -399,6 +402,7 @@ export const onCall = async (message: CoreMessage) => {
             // wait for self-release and then carry on
             await device.waitForFirstRun();
         } else {
+            // TODO(karliatto): should we remove this commented code???
             // cancel popup request
             // postMessage(UiMessage(POPUP.CANCEL_POPUP_REQUEST));
             postMessage(
@@ -568,6 +572,7 @@ export const onCall = async (message: CoreMessage) => {
                     );
                     return inner();
                 }
+                // TODO(karliatto): shouldn't we remove all this dead commented code?
                 // other error
                 // postMessage(ResponseMessage(method.responseID, false, { error }));
                 // closePopup();
@@ -661,6 +666,7 @@ export const onCall = async (message: CoreMessage) => {
  * @memberof Core
  */
 const cleanup = () => {
+    // TODO(karliatto): shouldn't we remove all this dead commented code?
     // closePopup(); // this causes problem when action is interrupted (example: bootloader mode)
     _popupPromise = undefined;
     _uiPromises = []; // TODO: remove only promises with params callId
@@ -673,10 +679,14 @@ const cleanup = () => {
  * @returns {void}
  * @memberof Core
  */
-const closePopup = () => {
+const closePopup = (payload?: { interruptionType: 'device-disconnected' }) => {
+    console.log('closePopup in connect core');
+    console.log('_popupPromise', _popupPromise);
     if (_popupPromise) {
-        postMessage(createPopupMessage(POPUP.CANCEL_POPUP_REQUEST));
+        // @ts-expect-error
+        postMessage(createPopupMessage(POPUP.CANCEL_POPUP_REQUEST, payload));
     }
+    // TODO(karliatto): CLOSE_UI_WINDOW is doing what???
     postMessage(createUiMessage(UI.CLOSE_UI_WINDOW));
 };
 
@@ -838,7 +848,12 @@ const onPopupClosed = (customErrorMessage?: string) => {
  * @returns {void}
  * @memberof Core
  */
-const handleDeviceSelectionChanges = (interruptDevice?: DeviceTyped) => {
+const handleDeviceSelectionChanges = (
+    interruptDevice?: DeviceTyped,
+    payload?: { interruptionType: 'device-disconnected' },
+) => {
+    console.log('handleDeviceSelectionChanges');
+    console.log('interruptDevice', interruptDevice);
     // update list of devices in popup
     const uiPromise = findUiPromise(UI.RECEIVE_DEVICE);
     if (uiPromise && _deviceList) {
@@ -882,7 +897,10 @@ const handleDeviceSelectionChanges = (interruptDevice?: DeviceTyped) => {
         }
 
         if (shouldClosePopup) {
-            closePopup();
+            console.log(
+                'sending message to close popup from connect core handleDeviceSelectionChanges',
+            );
+            closePopup(payload);
             cleanup();
         }
     }
@@ -895,25 +913,37 @@ const handleDeviceSelectionChanges = (interruptDevice?: DeviceTyped) => {
  * @memberof Core
  */
 const initDeviceList = async (settings: ConnectSettings) => {
+    console.log('initDeviceList  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+    console.log('settings', settings);
     try {
         _deviceList = new DeviceList();
 
         _deviceList.on(DEVICE.CONNECT, device => {
+            console.log('DEVICE.CONNECT from _deviceList in connect core');
+            console.log('device', device);
             handleDeviceSelectionChanges();
             postMessage(createDeviceMessage(DEVICE.CONNECT, device));
         });
 
         _deviceList.on(DEVICE.CONNECT_UNACQUIRED, device => {
+            console.log('DEVICE.CONNECT_UNACQUIRED from _deviceList in connect core');
+            console.log('device', device);
             handleDeviceSelectionChanges();
             postMessage(createDeviceMessage(DEVICE.CONNECT_UNACQUIRED, device));
         });
 
         _deviceList.on(DEVICE.DISCONNECT, device => {
-            handleDeviceSelectionChanges(device);
+            console.log('DEVICE.DISCONNECT from _deviceList in connect core');
+            console.log('device', device);
+            // TODO(karlitto): should we send handleDeviceSelectionChanges and post message with DEVICE.DISCONNECTED ??
+            // TODO(karlitto): or should we just use the postMessage sent ???
+            handleDeviceSelectionChanges(device, { interruptionType: 'device-disconnected' });
             postMessage(createDeviceMessage(DEVICE.DISCONNECT, device));
         });
 
         _deviceList.on(DEVICE.CHANGED, device => {
+            console.log('DEVICE.CHANGED from _deviceList in connect core');
+            console.log('device', device);
             postMessage(createDeviceMessage(DEVICE.CHANGED, device));
         });
 

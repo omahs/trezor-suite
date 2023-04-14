@@ -42,12 +42,14 @@ let _popupMessagePort: (MessagePort | BroadcastChannel) | undefined;
 // we need to listen to events from Core and convert it to simple objects possible to send over window.postMessage
 
 const handleMessage = (event: PostMessageEvent) => {
+    console.log('connect-iframe Wrapper which listens to events from Core');
     // ignore messages from myself (chrome bug?)
     if (event.source === window || !event.data) return;
     const { data } = event;
     const id = typeof data.id === 'number' ? data.id : 0;
 
     const fail = (error: string) => {
+        console.log('fail in handleMessage in connect-iframe');
         postMessage(createResponseMessage(id, false, { error }));
         postMessage(createPopupMessage(POPUP.CANCEL_POPUP_REQUEST));
     };
@@ -122,14 +124,16 @@ const handleMessage = (event: PostMessageEvent) => {
     }
 };
 
-// communication with parent window
+// Communication with 3rd party window and Trezor Popup.
 const postMessage = (message: CoreMessage) => {
+    console.log('postMessage from iframe');
     _log.debug('postMessage', message);
 
     const usingPopup = DataManager.getSettings('popup');
     const trustedHost = DataManager.getSettings('trustedHost');
     const handshake = message.type === IFRAME.LOADED;
 
+    console.log('usingPopup');
     // popup handshake is resolved automatically
     if (!usingPopup) {
         if (_core && message.type === UI.REQUEST_UI_WINDOW) {
@@ -156,9 +160,17 @@ const postMessage = (message: CoreMessage) => {
         message.payload.udev = suggestUdevInstaller(platform);
     }
 
+    // TODO(karliatto): here we could add payload saying the reason in case of disconnected device
+
+    console.log('usingPopup', usingPopup);
+    console.log('message', message);
+    console.log('targetUiEvent(message)', targetUiEvent(message));
     if (usingPopup && targetUiEvent(message)) {
         if (_popupMessagePort) {
             _popupMessagePort.postMessage(message);
+        } else {
+            // TODO(karliatto): add here some logging
+            console.log('Missing _popupMessagePort');
         }
     } else {
         let origin = DataManager.getSettings('origin');
@@ -171,12 +183,14 @@ const targetUiEvent = (message: CoreMessage) => {
     const whitelistedMessages: CoreMessage['type'][] = [
         IFRAME.LOADED,
         IFRAME.ERROR,
-        POPUP.CANCEL_POPUP_REQUEST,
+        // POPUP.CANCEL_POPUP_REQUEST,
         UI.CLOSE_UI_WINDOW,
         UI.LOGIN_CHALLENGE_REQUEST,
         UI.BUNDLE_PROGRESS,
         UI.ADDRESS_VALIDATION,
     ];
+    // TODO(karliatto): this is actually blacklisted???
+    // TODO(karliatto): maybe other naming to tell what it is actually doing - deciding if message should go to popup or not
     return message.event === UI_EVENT && whitelistedMessages.indexOf(message.type) < 0;
 };
 
@@ -200,6 +214,9 @@ const filterDeviceEvent = (message: DeviceEvent) => {
 };
 
 const init = async (payload: IFrameInit['payload'], origin: string) => {
+    console.log('init in connect-iframe');
+    console.log('payload', payload);
+    console.log('origin', origin);
     if (DataManager.getSettings('origin')) return; // already initialized
     const parsedSettings = parseConnectSettings(
         {
@@ -227,7 +244,10 @@ const init = async (payload: IFrameInit['payload'], origin: string) => {
     try {
         // initialize core
         _core = await initCore(parsedSettings);
-        _core.on(CORE_EVENT, postMessage);
+        _core.on(CORE_EVENT, event => {
+            console.log('event from CORE_EVENT', event);
+            postMessage(event);
+        });
 
         // initialize transport and wait for the first transport event (start or error)
         await initTransport(parsedSettings);

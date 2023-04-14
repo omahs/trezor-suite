@@ -39,6 +39,7 @@ type ConnectUIProps = {
 };
 
 export const ConnectUI = ({ postMessage, clearLegacyView }: ConnectUIProps) => {
+    console.log('ConnectUI');
     // we simply store all UI relevant messages here and use them to derive what should we render
     const [messages, setMessages] = useState<(ConnectUIEventProps | null)[]>([]);
     // flowInfo is the only exception to the rule outlined above

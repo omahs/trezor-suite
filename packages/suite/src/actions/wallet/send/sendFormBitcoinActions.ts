@@ -74,7 +74,7 @@ export const composeTransaction =
 
         // exclude unspendable utxos if coin control is not enabled
         // unspendable utxos are defined in `useSendForm` hook
-        const utxo = formValues.isCoinControlEnabled
+        const utxos = formValues.isCoinControlEnabled
             ? formValues.selectedUtxos?.map(u => ({ ...u, required: true }))
             : account.utxo.filter(u => (u as any).required || !excludedUtxos?.[getUtxoOutpoint(u)]);
 
@@ -82,7 +82,7 @@ export const composeTransaction =
             account: {
                 path: account.path,
                 addresses: account.addresses,
-                utxo,
+                utxos,
             },
             feeLevels: predefinedLevels,
             baseFee,

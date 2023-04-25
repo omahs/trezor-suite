@@ -619,7 +619,7 @@ export const setMax = [
                 account: {
                     // only utxos with enough anonymity are used in TrezorConnect.composeTransaction
                     // see sendFormBitcoinActions
-                    utxo: [UTXO.BB, UTXO.DD],
+                    utxos: [UTXO.BB, UTXO.DD],
                 },
             },
         },
@@ -956,12 +956,12 @@ export const setMax = [
                     composeTransactionParams: {
                         outputs: [
                             {
-                                type: 'external',
+                                type: 'payment',
                                 address: '3AnYTd2FGxJLNKL1AzxfW3FJMntp9D2KKX',
                                 amount: '100000000',
                             },
                             {
-                                type: 'external',
+                                type: 'payment',
                                 address: '3AnYTd2FGxJLNKL1AzxfW3FJMntp9D2KKX',
                                 amount: '20000000',
                             },
@@ -976,7 +976,7 @@ export const setMax = [
             //     result: {
             //         composeTransactionParams: {
             //             outputs: [
-            //                 { type: 'external', address: '3AnYTd2FGxJLNKL1AzxfW3FJMntp9D2KKX', amount: '100000000' }
+            //                 { type: 'payment', address: '3AnYTd2FGxJLNKL1AzxfW3FJMntp9D2KKX', amount: '100000000' }
             //             ]
             //         },
             //     },

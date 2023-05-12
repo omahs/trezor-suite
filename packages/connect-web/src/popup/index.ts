@@ -13,7 +13,7 @@ import {
 import { getOrigin } from '@trezor/connect/lib/utils/urlUtils';
 import { showPopupRequest } from './showPopupRequest';
 
-// const POPUP_REQUEST_TIMEOUT = 602;
+// Event `POPUP_REQUEST_TIMEOUT` is used to close Popup window when there was no handshake from iframe.
 const POPUP_REQUEST_TIMEOUT = 850;
 const POPUP_CLOSE_INTERVAL = 500;
 const POPUP_OPEN_TIMEOUT = 3000;
@@ -281,12 +281,15 @@ export class PopupManager extends EventEmitter {
             // send ConnectSettings to popup
             // note this settings and iframe.ConnectSettings could be different (especially: origin, popup, webusb, debug)
             // now popup is able to load assets
-        } else if (data.type === POPUP.CANCEL_POPUP_REQUEST || data.type === UI.CLOSE_UI_WINDOW) {
-            this.close();
+        } else if (
+            data.type === POPUP.CANCEL_POPUP_REQUEST
+            //  || data.type === UI.CLOSE_UI_WINDOW // Ignoring because it is always sent with CANCEL_POPUP_REQUEST
+        ) {
+            this.close(message);
         }
     }
 
-    close() {
+    close(message?: MessageEvent) {
         this.locked = false;
         this.popupPromise = undefined;
 
@@ -315,17 +318,37 @@ export class PopupManager extends EventEmitter {
             this.extensionTabId = 0;
         }
 
-        if (this.popupWindow) {
-            if (this.settings.env === 'webextension') {
-                // @ts-expect-error
-                let _e = chrome.runtime.lastError;
+        if (!this.popupWindow) return;
 
-                chrome.tabs.remove(this.popupWindow.id, () => {
-                    _e = chrome.runtime.lastError;
-                });
-            } else {
-                this.popupWindow.close();
-            }
+        const isErrorClosing =
+            message?.data.type === POPUP.CANCEL_POPUP_REQUEST && !message?.data.payload.success;
+        const shouldDisplayErrorInPopup = isErrorClosing && this.settings.debug;
+
+        if (shouldDisplayErrorInPopup) {
+            // When request to close in debug mode instead send message to popup to display error.
+
+            // TODO: when triggering POPUP.CANCEL_POPUP_REQUEST we could pass reason to propagate it
+            // to the error page in popup.
+            this.popupWindow.postMessage(
+                {
+                    type: POPUP.SHOW_ERROR,
+                    payload: {
+                        settings: this.settings,
+                    },
+                },
+                this.origin,
+            );
+        }
+
+        if (this.settings.env === 'webextension') {
+            // @ts-expect-error
+            let _e = chrome.runtime.lastError;
+
+            chrome.tabs.remove(this.popupWindow.id, () => {
+                _e = chrome.runtime.lastError;
+            });
+        } else if (!this.settings.debug) {
+            this.popupWindow.close();
             this.popupWindow = null;
         }
     }

@@ -303,7 +303,7 @@ export const onCall = async (message: CoreMessage) => {
         // start validation process
         method.init();
     } catch (error) {
-        postMessage(createPopupMessage(POPUP.CANCEL_POPUP_REQUEST));
+        postMessage(createPopupMessage(POPUP.ERROR_CANCEL_POPUP_REQUEST));
         postMessage(createResponseMessage(responseID, false, { error }));
         return Promise.resolve();
     }
@@ -318,7 +318,7 @@ export const onCall = async (message: CoreMessage) => {
                 await getPopupPromise().promise;
             } else {
                 // cancel popup request
-                postMessage(createPopupMessage(POPUP.CANCEL_POPUP_REQUEST));
+                postMessage(createPopupMessage(POPUP.SUCCESS_CANCEL_POPUP_REQUEST));
             }
             const response = await method.run();
             messageResponse = createResponseMessage(method.responseID, true, response);
@@ -335,7 +335,7 @@ export const onCall = async (message: CoreMessage) => {
     }
 
     if (method.isManagementRestricted()) {
-        postMessage(createPopupMessage(POPUP.CANCEL_POPUP_REQUEST));
+        postMessage(createPopupMessage(POPUP.ERROR_CANCEL_POPUP_REQUEST));
         postMessage(
             createResponseMessage(responseID, false, {
                 error: ERRORS.TypedError('Method_NotAllowed'),
@@ -356,7 +356,7 @@ export const onCall = async (message: CoreMessage) => {
             postMessage(createUiMessage(UI.TRANSPORT));
         } else {
             // cancel popup request
-            postMessage(createPopupMessage(POPUP.CANCEL_POPUP_REQUEST));
+            postMessage(createPopupMessage(POPUP.ERROR_CANCEL_POPUP_REQUEST));
         }
         // TODO: this should not be returned here before user agrees on "read" perms...
         postMessage(createResponseMessage(responseID, false, { error }));
@@ -576,7 +576,7 @@ export const onCall = async (message: CoreMessage) => {
                 await getPopupPromise().promise;
             } else {
                 // popup is not required
-                postMessage(createPopupMessage(POPUP.CANCEL_POPUP_REQUEST));
+                postMessage(createPopupMessage(POPUP.SUCCESS_CANCEL_POPUP_REQUEST));
             }
 
             // run method
@@ -638,7 +638,7 @@ export const onCall = async (message: CoreMessage) => {
 
             await device.cleanup();
 
-            closePopup();
+            closePopup(response.success === true);
             cleanup();
 
             if (method) {
@@ -673,9 +673,12 @@ const cleanup = () => {
  * @returns {void}
  * @memberof Core
  */
-const closePopup = () => {
+const closePopup = (success: boolean) => {
     if (_popupPromise) {
-        postMessage(createPopupMessage(POPUP.CANCEL_POPUP_REQUEST));
+        const popupMessage = success
+            ? POPUP.SUCCESS_CANCEL_POPUP_REQUEST
+            : POPUP.ERROR_CANCEL_POPUP_REQUEST;
+        postMessage(createPopupMessage(popupMessage));
     }
     postMessage(createUiMessage(UI.CLOSE_UI_WINDOW));
 };
@@ -882,7 +885,7 @@ const handleDeviceSelectionChanges = (interruptDevice?: DeviceTyped) => {
         }
 
         if (shouldClosePopup) {
-            closePopup();
+            closePopup(false);
             cleanup();
         }
     }

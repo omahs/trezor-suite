@@ -12,6 +12,8 @@ export const POPUP = {
     INIT: 'popup-init',
     // Error message from popup to window.opener. Could be thrown during popup initialization process (POPUP.INIT)
     ERROR: 'popup-error',
+    // Error message from PopupManager to popup so it displays error page.
+    SHOW_ERROR: 'show-error',
     // Message to webextensions, opens "trezor-usb-permission.html" within webextension
     EXTENSION_USB_PERMISSIONS: 'open-usb-permissions',
     // Message called from both [popup > iframe] then [iframe > popup] in this exact order.
@@ -21,9 +23,10 @@ export const POPUP = {
     // Event emitted from PopupManager at the end of popup closing process.
     // Sent from popup thru window.opener to an iframe because message channel between popup and iframe is no longer available
     CLOSED: 'popup-closed',
-    // Message called from iframe to popup, it means that popup will not be needed (example: Blockchain methods are not using popup at all)
-    // This will close active popup window and/or clear opening process in PopupManager (maybe popup wasn't opened yet)
-    CANCEL_POPUP_REQUEST: 'ui-cancel-popup-request',
+    // Message emitted from iframe to PopupManager, it means that popup will not be needed since request successfully finished.
+    SUCCESS_CANCEL_POPUP_REQUEST: 'ui-success-cancel-popup-request',
+    // Message emitted from iframe to PopupManager, it means that popup should display error message.
+    ERROR_CANCEL_POPUP_REQUEST: 'ui-error-cancel-popup-request',
     // Message called from inline element in popup.html (window.closeWindow), this is used only with webextensions to properly handle popup close event
     CLOSE_WINDOW: 'window.close',
 } as const;
@@ -53,6 +56,13 @@ export interface PopupError {
     };
 }
 
+export interface PopupShowError {
+    type: typeof POPUP.SHOW_ERROR;
+    payload: {
+        error: string;
+    };
+}
+
 export interface PopupClosedMessage {
     type: typeof POPUP.CLOSED;
     payload: { error: any } | null;
@@ -60,12 +70,16 @@ export interface PopupClosedMessage {
 
 export type PopupEvent =
     | {
-          type: typeof POPUP.LOADED | typeof POPUP.CANCEL_POPUP_REQUEST;
+          type:
+              | typeof POPUP.LOADED
+              | typeof POPUP.ERROR_CANCEL_POPUP_REQUEST
+              | typeof POPUP.SUCCESS_CANCEL_POPUP_REQUEST;
           payload?: typeof undefined;
       }
     | PopupInit
     | PopupHandshake
     | PopupError
+    | PopupShowError
     | PopupClosedMessage;
 
 export type PopupEventMessage = PopupEvent & { event: typeof UI_EVENT };

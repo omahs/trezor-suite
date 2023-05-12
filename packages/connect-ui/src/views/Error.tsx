@@ -15,7 +15,8 @@ const WhiteCollapsibleBox = styled(CollapsibleBox)`
 export interface ErrorViewProps {
     type: 'error';
     detail: // errors that might arise when using connect-ui with connect-popup
-    | 'handshake-timeout' // communication was not established in a set time period
+    | 'unknown' // Generic error.
+        | 'handshake-timeout' // communication was not established in a set time period
         | 'iframe-failure'; // another (legacy) error, this is sent from popupManager (host) to popup. it means basically the same like handshake-timeout but we might be notified earlier
     // future errors when using connect-ui in different contexts
 }
@@ -133,6 +134,16 @@ const getTroubleshootingTips = (props: ErrorViewProps) => {
                 },
             });
         }
+    }
+
+    if (props.detail === 'unknown') {
+        tips.push({
+            icon: 'QUESTION',
+            title: 'There was an error',
+            detail: {
+                steps: [<Step>Try again</Step>],
+            },
+        });
     }
 
     if (!tips.length) {

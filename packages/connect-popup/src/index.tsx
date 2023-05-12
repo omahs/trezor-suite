@@ -50,6 +50,13 @@ const handleMessage = (event: MessageEvent<PopupEvent | UiEvent>) => {
         return;
     }
 
+    if (data.type === POPUP.SHOW_ERROR) {
+        reactEventBus.dispatch({
+            type: 'error',
+            detail: 'unknown',
+        });
+    }
+
     // This is message from the window.opener
     if (data.type === UI_REQUEST.IFRAME_FAILURE) {
         reactEventBus.dispatch({

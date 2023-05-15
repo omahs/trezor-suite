@@ -2,6 +2,7 @@ import { UI_EVENT } from './ui-request';
 import type { TransportInfo } from './transport';
 import type { ConnectSettings, SystemInfo } from '../types';
 import type { MessageFactoryFn } from '../types/utils';
+import { CoreMessage } from './core';
 
 export const POPUP = {
     // Message called from popup.html inline script before "window.onload" event. This is first message from popup to window.opener.
@@ -23,6 +24,9 @@ export const POPUP = {
     // Event emitted from PopupManager at the end of popup closing process.
     // Sent from popup thru window.opener to an iframe because message channel between popup and iframe is no longer available
     CLOSED: 'popup-closed',
+    // We keep sending this message to avoid breaking changes in 3rd party, it is emitted when popup will not be needed.
+    // every time that `SUCCESS_CANCEL_POPUP_REQUEST` or `ERROR_CANCEL_POPUP_REQUEST` is emitted.
+    CANCEL_POPUP_REQUEST: 'ui-cancel-popup-request',
     // Message emitted from iframe to PopupManager, it means that popup will not be needed since request successfully finished.
     SUCCESS_CANCEL_POPUP_REQUEST: 'ui-success-cancel-popup-request',
     // Message emitted from iframe to PopupManager, it means that popup should display error message.
@@ -72,6 +76,7 @@ export type PopupEvent =
     | {
           type:
               | typeof POPUP.LOADED
+              | typeof POPUP.CANCEL_POPUP_REQUEST
               | typeof POPUP.ERROR_CANCEL_POPUP_REQUEST
               | typeof POPUP.SUCCESS_CANCEL_POPUP_REQUEST;
           payload?: typeof undefined;
@@ -90,3 +95,13 @@ export const createPopupMessage: MessageFactoryFn<typeof UI_EVENT, PopupEvent> =
         type,
         payload,
     } as any);
+
+export const postErrorCancelPopupRequest = (postMessage: (message: CoreMessage) => void) => {
+    postMessage(createPopupMessage(POPUP.ERROR_CANCEL_POPUP_REQUEST));
+    postMessage(createPopupMessage(POPUP.CANCEL_POPUP_REQUEST));
+};
+
+export const postSuccessCancelPopupRequest = (postMessage: (message: CoreMessage) => void) => {
+    postMessage(createPopupMessage(POPUP.SUCCESS_CANCEL_POPUP_REQUEST));
+    postMessage(createPopupMessage(POPUP.CANCEL_POPUP_REQUEST));
+};

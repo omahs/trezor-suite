@@ -25,6 +25,8 @@ import {
     CoreMessage,
     UiPromise,
     UiPromiseResponse,
+    postErrorCancelPopupRequest,
+    postSuccessCancelPopupRequest,
 } from '../events';
 import { getMethod } from './method';
 
@@ -303,7 +305,7 @@ export const onCall = async (message: CoreMessage) => {
         // start validation process
         method.init();
     } catch (error) {
-        postMessage(createPopupMessage(POPUP.ERROR_CANCEL_POPUP_REQUEST));
+        postErrorCancelPopupRequest(postMessage);
         postMessage(createResponseMessage(responseID, false, { error }));
         return Promise.resolve();
     }
@@ -318,7 +320,7 @@ export const onCall = async (message: CoreMessage) => {
                 await getPopupPromise().promise;
             } else {
                 // cancel popup request
-                postMessage(createPopupMessage(POPUP.SUCCESS_CANCEL_POPUP_REQUEST));
+                postSuccessCancelPopupRequest(postMessage);
             }
             const response = await method.run();
             messageResponse = createResponseMessage(method.responseID, true, response);
@@ -335,7 +337,7 @@ export const onCall = async (message: CoreMessage) => {
     }
 
     if (method.isManagementRestricted()) {
-        postMessage(createPopupMessage(POPUP.ERROR_CANCEL_POPUP_REQUEST));
+        postErrorCancelPopupRequest(postMessage);
         postMessage(
             createResponseMessage(responseID, false, {
                 error: ERRORS.TypedError('Method_NotAllowed'),
@@ -356,7 +358,7 @@ export const onCall = async (message: CoreMessage) => {
             postMessage(createUiMessage(UI.TRANSPORT));
         } else {
             // cancel popup request
-            postMessage(createPopupMessage(POPUP.ERROR_CANCEL_POPUP_REQUEST));
+            postErrorCancelPopupRequest(postMessage);
         }
         // TODO: this should not be returned here before user agrees on "read" perms...
         postMessage(createResponseMessage(responseID, false, { error }));
@@ -576,7 +578,7 @@ export const onCall = async (message: CoreMessage) => {
                 await getPopupPromise().promise;
             } else {
                 // popup is not required
-                postMessage(createPopupMessage(POPUP.SUCCESS_CANCEL_POPUP_REQUEST));
+                postSuccessCancelPopupRequest(postMessage);
             }
 
             // run method

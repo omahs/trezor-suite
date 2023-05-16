@@ -213,7 +213,7 @@ const HeadingH1 = styled.div`
 `;
 
 export const ErrorView = (props: ErrorViewProps) => (
-    <View>
+    <View data-test="@connect-ui/error">
         <InnerWrapper>
             <H>Error</H>
             <Text>You can try the following steps to solve the problem</Text>

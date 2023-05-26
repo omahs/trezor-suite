@@ -242,7 +242,11 @@ export const ErrorView = (props: ErrorViewProps) => (
                 ))}
             </TipsContainer>
 
-            <Button variant="primary" onClick={() => window.close()}>
+            <Button
+                data-test="@connect-ui/error-close-button"
+                variant="primary"
+                onClick={() => window.close()}
+            >
                 Close
             </Button>
         </InnerWrapper>

@@ -62,8 +62,7 @@ const handleMessage = (message: CoreMessage) => {
         return;
     }
 
-    if (type === POPUP.SUCCESS_CANCEL_POPUP_REQUEST || type === POPUP.ERROR_CANCEL_POPUP_REQUEST)
-        return;
+    if (type === POPUP.CANCEL_POPUP_REQUEST) return;
 
     _log.debug('handleMessage', message);
 

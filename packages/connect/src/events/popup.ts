@@ -2,7 +2,6 @@ import { UI_EVENT } from './ui-request';
 import type { TransportInfo } from './transport';
 import type { ConnectSettings, SystemInfo } from '../types';
 import type { MessageFactoryFn } from '../types/utils';
-import { CoreMessage } from './core';
 
 export const POPUP = {
     // Message called from popup.html inline script before "window.onload" event. This is first message from popup to window.opener.
@@ -24,13 +23,9 @@ export const POPUP = {
     // Event emitted from PopupManager at the end of popup closing process.
     // Sent from popup thru window.opener to an iframe because message channel between popup and iframe is no longer available
     CLOSED: 'popup-closed',
-    // We keep sending this message to avoid breaking changes in 3rd party, it is emitted when popup will not be needed.
-    // every time that `SUCCESS_CANCEL_POPUP_REQUEST` or `ERROR_CANCEL_POPUP_REQUEST` is emitted.
+    // Message called from iframe to popup, it means that popup will not be needed (example: Blockchain methods are not using popup at all)
+    // In case of success (provided by metadata) this will close popup otherwise it will show error page in popup (TODO: for now only in debug mode)
     CANCEL_POPUP_REQUEST: 'ui-cancel-popup-request',
-    // Message emitted from iframe to PopupManager, it means that popup will not be needed since request successfully finished.
-    SUCCESS_CANCEL_POPUP_REQUEST: 'ui-success-cancel-popup-request',
-    // Message emitted from iframe to PopupManager, it means that popup should display error message.
-    ERROR_CANCEL_POPUP_REQUEST: 'ui-error-cancel-popup-request',
     // Message called from inline element in popup.html (window.closeWindow), this is used only with webextensions to properly handle popup close event
     CLOSE_WINDOW: 'window.close',
 } as const;
@@ -74,12 +69,12 @@ export interface PopupClosedMessage {
 
 export type PopupEvent =
     | {
-          type:
-              | typeof POPUP.LOADED
-              | typeof POPUP.CANCEL_POPUP_REQUEST
-              | typeof POPUP.ERROR_CANCEL_POPUP_REQUEST
-              | typeof POPUP.SUCCESS_CANCEL_POPUP_REQUEST;
+          type: typeof POPUP.LOADED;
           payload?: typeof undefined;
+      }
+    | {
+          type: typeof POPUP.CANCEL_POPUP_REQUEST;
+          payload: { success: boolean };
       }
     | PopupInit
     | PopupHandshake
@@ -95,13 +90,3 @@ export const createPopupMessage: MessageFactoryFn<typeof UI_EVENT, PopupEvent> =
         type,
         payload,
     } as any);
-
-export const postErrorCancelPopupRequest = (postMessage: (message: CoreMessage) => void) => {
-    postMessage(createPopupMessage(POPUP.ERROR_CANCEL_POPUP_REQUEST));
-    postMessage(createPopupMessage(POPUP.CANCEL_POPUP_REQUEST));
-};
-
-export const postSuccessCancelPopupRequest = (postMessage: (message: CoreMessage) => void) => {
-    postMessage(createPopupMessage(POPUP.SUCCESS_CANCEL_POPUP_REQUEST));
-    postMessage(createPopupMessage(POPUP.CANCEL_POPUP_REQUEST));
-};

@@ -25,8 +25,6 @@ import {
     CoreMessage,
     UiPromise,
     UiPromiseResponse,
-    postErrorCancelPopupRequest,
-    postSuccessCancelPopupRequest,
 } from '../events';
 import { getMethod } from './method';
 
@@ -305,7 +303,7 @@ export const onCall = async (message: CoreMessage) => {
         // start validation process
         method.init();
     } catch (error) {
-        postErrorCancelPopupRequest(postMessage);
+        postMessage(createPopupMessage(POPUP.CANCEL_POPUP_REQUEST, { success: false }));
         postMessage(createResponseMessage(responseID, false, { error }));
         return Promise.resolve();
     }
@@ -320,7 +318,7 @@ export const onCall = async (message: CoreMessage) => {
                 await getPopupPromise().promise;
             } else {
                 // cancel popup request
-                postSuccessCancelPopupRequest(postMessage);
+                postMessage(createPopupMessage(POPUP.CANCEL_POPUP_REQUEST, { success: true }));
             }
             const response = await method.run();
             messageResponse = createResponseMessage(method.responseID, true, response);
@@ -337,7 +335,7 @@ export const onCall = async (message: CoreMessage) => {
     }
 
     if (method.isManagementRestricted()) {
-        postErrorCancelPopupRequest(postMessage);
+        postMessage(createPopupMessage(POPUP.CANCEL_POPUP_REQUEST, { success: false }));
         postMessage(
             createResponseMessage(responseID, false, {
                 error: ERRORS.TypedError('Method_NotAllowed'),
@@ -358,7 +356,7 @@ export const onCall = async (message: CoreMessage) => {
             postMessage(createUiMessage(UI.TRANSPORT));
         } else {
             // cancel popup request
-            postErrorCancelPopupRequest(postMessage);
+            postMessage(createPopupMessage(POPUP.CANCEL_POPUP_REQUEST, { success: false }));
         }
         // TODO: this should not be returned here before user agrees on "read" perms...
         postMessage(createResponseMessage(responseID, false, { error }));
@@ -578,7 +576,7 @@ export const onCall = async (message: CoreMessage) => {
                 await getPopupPromise().promise;
             } else {
                 // popup is not required
-                postSuccessCancelPopupRequest(postMessage);
+                postMessage(createPopupMessage(POPUP.CANCEL_POPUP_REQUEST, { success: true }));
             }
 
             // run method
@@ -677,10 +675,7 @@ const cleanup = () => {
  */
 const closePopup = (success: boolean) => {
     if (_popupPromise) {
-        const popupMessage = success
-            ? POPUP.SUCCESS_CANCEL_POPUP_REQUEST
-            : POPUP.ERROR_CANCEL_POPUP_REQUEST;
-        postMessage(createPopupMessage(popupMessage));
+        postMessage(createPopupMessage(POPUP.CANCEL_POPUP_REQUEST, { success }));
     }
     postMessage(createUiMessage(UI.CLOSE_UI_WINDOW));
 };

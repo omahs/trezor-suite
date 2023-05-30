@@ -233,8 +233,6 @@ connect-popup:
   dependencies:
     - install
     - connect-web build
-  only:
-    <<: *run_everything_rules
 
 connect-popup manual:
   extends: .e2e connect-popup

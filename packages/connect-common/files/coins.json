@@ -2219,25 +2219,6 @@
             "url": "https://expanse.tech"
         },
         {
-            "blockchain_link": {
-                "type": "blockbook",
-                "url": ["https://goerli1.trezor.io", "https://goerli2.trezor.io"]
-            },
-            "chain": "gor",
-            "chain_id": 5,
-            "name": "G\u00f6rli",
-            "rskip60": false,
-            "shortcut": "tGOR",
-            "slip44": 1,
-            "support": {
-                "connect": true,
-                "suite": false,
-                "trezor1": "1.11.2",
-                "trezor2": "2.5.2"
-            },
-            "url": "https://goerli.net/#about"
-        },
-        {
             "blockchain_link": null,
             "chain": "ubq",
             "chain_id": 8,

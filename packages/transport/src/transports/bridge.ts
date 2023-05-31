@@ -1,4 +1,5 @@
 import { versionUtils, createTimeoutPromise, createDeferred, Deferred } from '@trezor/utils';
+import { PROTOCOL_MALFORMED } from '@trezor/protocol';
 
 import { bridgeApiCall } from '../utils/bridgeApiCall';
 import * as bridgeApiResult from '../utils/bridgeApiResult';
@@ -318,7 +319,7 @@ export class BridgeTransport extends AbstractTransport {
         string,
         | BridgeCommonErrors
         | typeof ERRORS.DEVICE_DISCONNECTED_DURING_ACTION
-        | typeof ERRORS.PROTOCOL_MALFORMED
+        | typeof PROTOCOL_MALFORMED
         | typeof ERRORS.OTHER_CALL_IN_PROGRESS
     >;
     private async _post(
@@ -332,7 +333,7 @@ export class BridgeTransport extends AbstractTransport {
         string,
         | BridgeCommonErrors
         | typeof ERRORS.DEVICE_DISCONNECTED_DURING_ACTION
-        | typeof ERRORS.PROTOCOL_MALFORMED
+        | typeof PROTOCOL_MALFORMED
         | typeof ERRORS.OTHER_CALL_IN_PROGRESS
     >;
     private async _post(
@@ -342,7 +343,7 @@ export class BridgeTransport extends AbstractTransport {
         string,
         | BridgeCommonErrors
         | typeof ERRORS.DEVICE_DISCONNECTED_DURING_ACTION
-        | typeof ERRORS.PROTOCOL_MALFORMED
+        | typeof PROTOCOL_MALFORMED
         | typeof ERRORS.OTHER_CALL_IN_PROGRESS
     >;
     private async _post(
@@ -390,6 +391,7 @@ export class BridgeTransport extends AbstractTransport {
                         ERRORS.SESSION_NOT_FOUND,
                         ERRORS.DEVICE_DISCONNECTED_DURING_ACTION,
                         ERRORS.OTHER_CALL_IN_PROGRESS,
+                        PROTOCOL_MALFORMED,
                     ]);
                 case '/enumerate':
                 case '/listen':
@@ -399,6 +401,7 @@ export class BridgeTransport extends AbstractTransport {
                         ERRORS.SESSION_NOT_FOUND,
                         ERRORS.DEVICE_DISCONNECTED_DURING_ACTION,
                         ERRORS.OTHER_CALL_IN_PROGRESS,
+                        PROTOCOL_MALFORMED,
                     ]);
                 case '/release':
                     return this.unknownError(response.error, [

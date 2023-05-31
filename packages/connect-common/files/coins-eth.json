@@ -1,0 +1,267 @@
+[
+    {
+        "blockchain_link": {
+            "type": "blockbook",
+            "url": ["https://eth1.trezor.io", "https://eth2.trezor.io"]
+        },
+        "chain": "eth",
+        "chain_id": 1,
+        "name": "Ethereum",
+        "rskip60": false,
+        "shortcut": "ETH",
+        "slip44": 60,
+        "support": {
+            "connect": true,
+            "suite": true,
+            "trezor1": "1.6.2",
+            "trezor2": "2.0.7"
+        },
+        "url": "https://ethereum.org"
+    },
+    {
+        "blockchain_link": null,
+        "chain": "exp",
+        "chain_id": 2,
+        "name": "Expanse Network",
+        "rskip60": false,
+        "shortcut": "EXP",
+        "slip44": 40,
+        "support": {
+            "connect": true,
+            "suite": false,
+            "trezor1": "1.6.2",
+            "trezor2": "2.0.7"
+        },
+        "url": "https://expanse.tech"
+    },
+    {
+        "blockchain_link": {
+            "type": "blockbook",
+            "url": ["https://goerli1.trezor.io", "https://goerli2.trezor.io"]
+        },
+        "chain": "gor",
+        "chain_id": 5,
+        "name": "G\u00f6rli",
+        "rskip60": false,
+        "shortcut": "tGOR",
+        "slip44": 1,
+        "support": {
+            "connect": true,
+            "suite": false,
+            "trezor1": "1.11.2",
+            "trezor2": "2.5.2"
+        },
+        "url": "https://goerli.net/#about"
+    },
+    {
+        "blockchain_link": null,
+        "chain": "ubq",
+        "chain_id": 8,
+        "name": "Ubiq",
+        "rskip60": false,
+        "shortcut": "UBQ",
+        "slip44": 108,
+        "support": {
+            "connect": true,
+            "suite": false,
+            "trezor1": "1.6.2",
+            "trezor2": "2.0.7"
+        },
+        "url": "https://ubiqsmart.com"
+    },
+    {
+        "blockchain_link": null,
+        "chain": "rsk",
+        "chain_id": 30,
+        "name": "RSK",
+        "rskip60": true,
+        "shortcut": "RBTC",
+        "slip44": 137,
+        "support": {
+            "connect": true,
+            "suite": false,
+            "trezor1": "1.6.2",
+            "trezor2": "2.0.7"
+        },
+        "url": "https://rsk.co"
+    },
+    {
+        "blockchain_link": null,
+        "chain": "trsk",
+        "chain_id": 31,
+        "name": "RSK Testnet",
+        "rskip60": false,
+        "shortcut": "tRBTC",
+        "slip44": 1,
+        "support": {
+            "connect": true,
+            "suite": false,
+            "trezor1": "1.6.2",
+            "trezor2": "2.0.7"
+        },
+        "url": "https://rsk.co"
+    },
+    {
+        "blockchain_link": null,
+        "chain": "go",
+        "chain_id": 60,
+        "name": "GoChain",
+        "rskip60": false,
+        "shortcut": "GO",
+        "slip44": 6060,
+        "support": {
+            "connect": true,
+            "suite": false,
+            "trezor1": "1.6.2",
+            "trezor2": "2.0.7"
+        },
+        "url": "https://gochain.io"
+    },
+    {
+        "blockchain_link": {
+            "type": "blockbook",
+            "url": ["https://etc1.trezor.io", "https://etc2.trezor.io"]
+        },
+        "chain": "etc",
+        "chain_id": 61,
+        "name": "Ethereum Classic",
+        "rskip60": false,
+        "shortcut": "ETC",
+        "slip44": 61,
+        "support": {
+            "connect": true,
+            "suite": true,
+            "trezor1": "1.6.2",
+            "trezor2": "2.0.7"
+        },
+        "url": "https://ethereumclassic.org"
+    },
+    {
+        "blockchain_link": null,
+        "chain": "mix",
+        "chain_id": 76,
+        "name": "Mix",
+        "rskip60": false,
+        "shortcut": "MIX",
+        "slip44": 76,
+        "support": {
+            "connect": true,
+            "suite": false,
+            "trezor1": "1.7.2",
+            "trezor2": "2.0.10"
+        },
+        "url": "https://mix-blockchain.org"
+    },
+    {
+        "blockchain_link": null,
+        "chain": "clo",
+        "chain_id": 820,
+        "name": "Callisto",
+        "rskip60": false,
+        "shortcut": "CLO",
+        "slip44": 820,
+        "support": {
+            "connect": true,
+            "suite": false,
+            "trezor1": "1.6.2",
+            "trezor2": "2.0.7"
+        },
+        "url": "https://callisto.network"
+    },
+    {
+        "blockchain_link": null,
+        "chain": "egem",
+        "chain_id": 1987,
+        "name": "EtherGem",
+        "rskip60": false,
+        "shortcut": "EGEM",
+        "slip44": 1987,
+        "support": {
+            "connect": true,
+            "suite": false,
+            "trezor1": "1.6.2",
+            "trezor2": "2.0.7"
+        },
+        "url": "https://egem.io"
+    },
+    {
+        "blockchain_link": null,
+        "chain": "esn",
+        "chain_id": 31102,
+        "name": "Ethersocial Network",
+        "rskip60": false,
+        "shortcut": "ESN",
+        "slip44": 31102,
+        "support": {
+            "connect": true,
+            "suite": false,
+            "trezor1": "1.6.3",
+            "trezor2": "2.0.8"
+        },
+        "url": "https://ethersocial.org"
+    },
+    {
+        "blockchain_link": null,
+        "chain": "aka",
+        "chain_id": 200625,
+        "name": "Akroma",
+        "rskip60": false,
+        "shortcut": "AKA",
+        "slip44": 200625,
+        "support": {
+            "connect": true,
+            "suite": false,
+            "trezor1": "1.6.3",
+            "trezor2": "2.0.8"
+        },
+        "url": "https://akroma.io"
+    },
+    {
+        "blockchain_link": null,
+        "chain": "etho",
+        "chain_id": 1313114,
+        "name": "Etho Protocol",
+        "rskip60": false,
+        "shortcut": "ETHO",
+        "slip44": 1313114,
+        "support": {
+            "connect": true,
+            "suite": false,
+            "trezor1": "1.6.3",
+            "trezor2": "2.0.8"
+        },
+        "url": "https://ethoprotocol.com"
+    },
+    {
+        "blockchain_link": null,
+        "chain": "music",
+        "chain_id": 7762959,
+        "name": "Musicoin",
+        "rskip60": false,
+        "shortcut": "MUSIC",
+        "slip44": 184,
+        "support": {
+            "connect": true,
+            "suite": false,
+            "trezor1": "1.6.3",
+            "trezor2": "2.0.8"
+        },
+        "url": "https://musicoin.tw"
+    },
+    {
+        "blockchain_link": null,
+        "chain": "pirl",
+        "chain_id": 3125659152,
+        "name": "Pirl",
+        "rskip60": false,
+        "shortcut": "PIRL",
+        "slip44": 164,
+        "support": {
+            "connect": true,
+            "suite": false,
+            "trezor1": "1.6.3",
+            "trezor2": "2.0.8"
+        },
+        "url": "https://pirl.io"
+    }
+]

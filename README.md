@@ -14,7 +14,7 @@ Welcome to the Trezor Suite repository! This repository contains the source code
 
 -   [NVM](https://github.com/nvm-sh/nvm)
 -   [Yarn](https://yarnpkg.com/lang/en/docs/install/)
--   [git lfs](https://git-lfs.github.com/)
+-   [Git LFS](https://git-lfs.github.com/)
 
 ## @trezor/connect
 

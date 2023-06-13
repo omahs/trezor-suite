@@ -4,7 +4,7 @@ Welcome to the Trezor Suite repository! This repository contains the source code
 
 -   **Connect** - tool that offers developers an easy way to integrate Trezor's functionality into their own applications
 -   **Trezor Suite** - desktop and web application for managing Trezor hardware wallet
--   **Mobile Suite Lite** - Mobile application designed for tracking user portfolios
+-   **Trezor Suite Lite** - Mobile application designed for tracking user portfolios
 
 ![img](https://repository-images.githubusercontent.com/148657224/439f6100-765f-11e9-9bff-b725eef3c4a6)
 

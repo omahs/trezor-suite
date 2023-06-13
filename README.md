@@ -1,18 +1,20 @@
 # TREZOR SUITE MONOREPO
 
-Welcome to the Trezor Suite repository! This repository contains the source code for 3 projects: 
-- **Connect** - tool that offers developers an easy way to integrate Trezor's functionality into their own applications
-- **Trezor Suite** - desktop and web application for managing Trezor hardware wallet
-- **Mobile Suite Lite** - Mobile application designed for tracking user portfolios
+Welcome to the Trezor Suite repository! This repository contains the source code for 3 projects:
+
+-   **Connect** - tool that offers developers an easy way to integrate Trezor's functionality into their own applications
+-   **Trezor Suite** - desktop and web application for managing Trezor hardware wallet
+-   **Mobile Suite Lite** - Mobile application designed for tracking user portfolios
 
 ![img](https://repository-images.githubusercontent.com/148657224/439f6100-765f-11e9-9bff-b725eef3c4a6)
 
-# development
+# Development
+
 ### Prerequisities
 
-- [NVM](https://github.com/nvm-sh/nvm)
-- [Yarn](https://yarnpkg.com/lang/en/docs/install/)
-- [git lfs](https://git-lfs.github.com/)
+-   [NVM](https://github.com/nvm-sh/nvm)
+-   [Yarn](https://yarnpkg.com/lang/en/docs/install/)
+-   [git lfs](https://git-lfs.github.com/)
 
 ## @trezor/connect
 
@@ -78,7 +80,6 @@ Run a dev build:
 | [@trezor/urls](./packages/urls)                                       | shared urls plus health checking             |
 | [@trezor/utils](./packages/utils)                                     | shared utility functions                     |
 | [@trezor/utxo-lib](./packages/utxo-lib)                               | btc-like coins lib                           |
-
 
 ## Contribute
 

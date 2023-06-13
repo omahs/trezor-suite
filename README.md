@@ -1,6 +1,44 @@
 # TREZOR SUITE MONOREPO
 
+Welcome to the Trezor Suite repository! This repository contains the source code for 3 projects: 
+- **Connect** - tool that offers developers an easy way to integrate Trezor's functionality into their own applications
+- **Trezor Suite** - desktop and web application for managing Trezor hardware wallet
+- **Mobile Suite Lite** - Mobile application designed for tracking user portfolios
+
 ![img](https://repository-images.githubusercontent.com/148657224/439f6100-765f-11e9-9bff-b725eef3c4a6)
+
+# development
+### Prerequisities
+
+- [NVM](https://github.com/nvm-sh/nvm)
+- [Yarn](https://yarnpkg.com/lang/en/docs/install/)
+- [git lfs](https://git-lfs.github.com/)
+
+## @trezor/connect
+
+This repository is used for development of version 9 of @trezor/connect. For detailed documentation, please refer to this [page](./docs/packages/connect/index.md).
+
+Historically, Trezor Connect had its [own repository](https://github.com/trezor/connect). This repository is now archived.
+
+## @trezor/suite
+
+-   `git clone git@github.com:trezor/trezor-suite.git`
+-   `git submodule update --init --recursive`
+-   `git lfs pull`
+-   `nvm install`
+-   `yarn`
+-   `yarn build:libs && yarn workspace @trezor/message-system sign-config`
+
+> It's recommended to enable `git config --global submodule.recurse true` so you don't need to run `git submodule update --init --recursive` every time when submodules are updated.
+
+> To set up your dev environment for a native platform (iOS/Android) follow [these additional steps](https://github.com/trezor/trezor-suite/tree/develop/suite-native/app#prerequisites).
+
+Run a dev build:
+
+-   `yarn suite:dev` (web app)
+-   `yarn suite:dev:desktop` (electron app)
+
+## @trezor/suite_mobile
 
 ## Packages
 
@@ -41,33 +79,6 @@
 | [@trezor/utils](./packages/utils)                                     | shared utility functions                     |
 | [@trezor/utxo-lib](./packages/utxo-lib)                               | btc-like coins lib                           |
 
-## @trezor/suite development
-
-Before you start make sure you have downloaded and installed [NVM](https://github.com/nvm-sh/nvm), [Yarn](https://yarnpkg.com/lang/en/docs/install/) and git with [git lfs](https://git-lfs.github.com/).
-
--   `git clone git@github.com:trezor/trezor-suite.git`
--   `git submodule update --init --recursive`
--   `git lfs pull`
--   `nvm install`
--   `yarn`
--   `yarn build:libs && yarn workspace @trezor/message-system sign-config`
-
-> It's recommended to enable `git config --global submodule.recurse true` so you don't need to run `git submodule update --init --recursive` every time when submodules are updated.
-
-> To set up your dev environment for a native platform (iOS/Android) follow [these additional steps](https://github.com/trezor/trezor-suite/tree/develop/suite-native/app#prerequisites).
-
-Run a dev build:
-
--   `yarn suite:dev` (web app)
--   `yarn suite:dev:desktop` (electron app)
-
-## @trezor/connect development
-
-Trezor Connect is a platform for easy integration of Trezor hardware wallets into 3rd party applications.
-
-This repository is used for development of version 9 of @trezor/connect. For detailed documentation, please refer to this [page](./docs/packages/connect/index.md).
-
-Historically, Trezor Connect had its [own repository](https://github.com/trezor/connect). This repository is now archived.
 
 ## Contribute
 

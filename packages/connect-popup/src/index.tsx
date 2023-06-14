@@ -8,6 +8,7 @@ import {
     PopupEvent,
     PopupInit,
     PopupHandshake,
+    RESPONSE_EVENT,
 } from '@trezor/connect';
 import { config } from '@trezor/connect/lib/data/config';
 
@@ -43,18 +44,11 @@ const escapeHtml = (payload: any) => {
 const handleMessage = (event: MessageEvent<PopupEvent | UiEvent>) => {
     const { data } = event;
     if (!data) return;
-
+    console.log('data', data);
     // This is message from the window.opener
     if (data.type === POPUP.INIT) {
         init(escapeHtml(data.payload)); // eslint-disable-line @typescript-eslint/no-use-before-define
         return;
-    }
-
-    if (data.type === POPUP.SHOW_ERROR) {
-        reactEventBus.dispatch({
-            type: 'error',
-            detail: 'unknown',
-        });
     }
 
     // This is message from the window.opener
@@ -97,6 +91,7 @@ const handleMessage = (event: MessageEvent<PopupEvent | UiEvent>) => {
         case UI_REQUEST.FIRMWARE_OUTDATED:
         case UI_REQUEST.DEVICE_NEEDS_BACKUP:
         case UI_REQUEST.REQUEST_PASSPHRASE:
+        case RESPONSE_EVENT:
             // todo: I don't have power to solve this now
             // @ts-expect-error
             reactEventBus.dispatch(message);

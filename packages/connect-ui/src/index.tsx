@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState, useMemo } from 'react';
 
 import styled from 'styled-components';
 
-import { PostMessage, UI, PopupHandshake, UI_REQUEST } from '@trezor/connect';
+import { PostMessage, UI, PopupHandshake, UI_REQUEST, RESPONSE_EVENT } from '@trezor/connect';
 
 // views
 import { Transport } from './views/Transport';
@@ -43,6 +43,8 @@ export const ConnectUI = ({ postMessage, clearLegacyView }: ConnectUIProps) => {
     const [messages, setMessages] = useState<(ConnectUIEventProps | null)[]>([]);
     // flowInfo is the only exception to the rule outlined above
     const [flowInfo, setFlowInfo] = useState<PopupHandshake['payload'] | undefined>(undefined);
+
+    console.log('messages', messages);
 
     const listener = useCallback((message: ConnectUIEventProps | null) => {
         if (message?.type === 'popup-handshake') {
@@ -89,6 +91,9 @@ export const ConnectUI = ({ postMessage, clearLegacyView }: ConnectUIProps) => {
                     break;
                 case 'error':
                     component = <ErrorView {...messages[0]} />;
+                    break;
+                case 'RESPONSE_EVENT':
+                    component = <>{JSON.stringify(messages[0])}</>
                     break;
                 default:
             }

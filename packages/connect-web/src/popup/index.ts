@@ -329,15 +329,16 @@ export class PopupManager extends EventEmitter {
 
             // TODO: when triggering POPUP.CANCEL_POPUP_REQUEST we could pass reason to propagate it
             // to the error page in popup.
-            this.popupWindow.postMessage(
-                {
-                    type: POPUP.SHOW_ERROR,
-                    payload: {
-                        settings: this.settings,
-                    },
-                },
-                this.origin,
-            );
+            // this.popupWindow.postMessage(
+            //     {
+            //         type: POPUP.SHOW_ERROR,
+            //         payload: {
+            //             settings: this.settings,
+            //         },
+            //     },
+            //     this.origin,
+            // );
+            return;
         }
 
         if (this.settings.env === 'webextension') {

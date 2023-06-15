@@ -380,6 +380,6 @@ export type {
     InternalTransfer,
     Transaction,
     TransactionDetail,
-    TypedRawTransaction,
+    AccountlessTransaction,
     Utxo,
 } from '@trezor/blockchain-link-types/lib/common';

@@ -8,16 +8,14 @@ import type {
 } from './params';
 import type { AccountBalanceHistory, FiatRates, TokenStandard } from './common';
 import type {
+    Tx as BlockbookTx,
     Vin,
     Vout,
     Utxo as BlockbookUtxo,
     WsInfoRes,
     WsBlockHashRes,
     Token as BlockbookToken,
-    EthereumParsedInputData as BlockbookEthereumParsedInputData,
-    EthereumSpecific as BlockbookEthereumSpecific,
     TokenTransfer as BlockbookTokenTransfer,
-    AddressAlias,
 } from './blockbook-api';
 
 type OptionalKey<M, K extends keyof M> = Omit<M, K> & Partial<Pick<M, K>>;
@@ -101,9 +99,6 @@ export interface AccountUtxoParams {
 
 export type VinVout = OptionalKey<Vin & Vout, 'addresses'>;
 
-type EthereumParsedData = BlockbookEthereumParsedInputData &
-    Partial<Pick<BlockbookEthereumParsedInputData, 'name'>>;
-
 export interface EthereumInternalTransfer {
     type: number;
     from: string;
@@ -111,37 +106,11 @@ export interface EthereumInternalTransfer {
     value?: string;
 }
 
-type EthereumSpecific = BlockbookEthereumSpecific & {
-    parsedData?: EthereumParsedData;
-};
-
-type TokenTransfer = BlockbookTokenTransfer & {
-    type: TokenStandard;
-};
-
-export interface Transaction {
-    txid: string;
-    version?: number;
-    vin: VinVout[];
-    vout: VinVout[];
-    blockHeight: number;
-    blockHash?: string;
-    confirmations: number;
-    blockTime: number;
-    value: string; // optional
-    valueIn: string; // optional
-    fees: string; // optional
-    hex: string; // optional
-    lockTime?: number;
-    vsize?: number;
-    size?: number;
-    ethereumSpecific?: EthereumSpecific;
-    tokenTransfers?: TokenTransfer[];
-    confirmationETABlocks?: number;
-    confirmationETASeconds?: number;
-    rbf?: boolean;
-    coinSpecificData?: any;
-    addressAliases?: { [key: string]: AddressAlias };
+export interface Transaction extends BlockbookTx {
+    fees: string; // optional in Tx, seems to always be there
+    tokenTransfers?: (BlockbookTokenTransfer & {
+        type: TokenStandard; // string in Tx, seems to always be ERC20 | ERC721 | ERC1155
+    })[];
 }
 
 export interface Push {

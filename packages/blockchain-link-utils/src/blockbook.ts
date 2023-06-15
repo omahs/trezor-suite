@@ -243,7 +243,7 @@ export const transformTransaction = (
         : undefined;
 
     // some instances of bb don't send size yet
-    const size = tx.size || typeof tx.hex === 'string' ? tx.hex.length / 2 : 0;
+    const size = tx.size || (typeof tx.hex === 'string' ? tx.hex.length / 2 : 0);
 
     return {
         type,

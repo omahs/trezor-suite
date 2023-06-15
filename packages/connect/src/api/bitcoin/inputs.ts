@@ -1,7 +1,6 @@
 // origin: https://github.com/trezor/connect/blob/develop/src/js/core/methods/tx/inputs.js
 
-import type { ComposedTxInput } from '@trezor/utxo-lib';
-import type { TypedRawTransaction } from '@trezor/blockchain-link';
+import { Transaction as BitcoinJsTransaction, ComposedTxInput } from '@trezor/utxo-lib';
 import { bufferUtils } from '@trezor/utils';
 import { validatePath, isSegwitPath, getScriptType, fixPath } from '../../utils/pathUtils';
 import { convertMultisigPubKey } from '../../utils/hdnodeUtils';
@@ -50,13 +49,16 @@ export const validateTrezorInputs = (
 
 // this method exist as a workaround for breaking change described in validateTrezorInputs
 // TODO: it could be removed after another major version release.
-export const enhanceTrezorInputs = (inputs: PROTO.TxInputType[], rawTxs: TypedRawTransaction[]) => {
+export const enhanceTrezorInputs = (
+    inputs: PROTO.TxInputType[],
+    rawTxs: BitcoinJsTransaction[],
+) => {
     inputs.forEach(input => {
         if (!input.amount) {
             console.warn('TrezorConnect.singTransaction deprecation: missing input amount.');
-            const refTx = rawTxs.find(t => 'txid' in t.tx && t.tx.txid === input.prev_hash);
-            if (refTx && refTx.type === 'blockbook' && refTx.tx.vout[input.prev_index]) {
-                input.amount = refTx.tx.vout[input.prev_index].value!;
+            const refTx = rawTxs.find(t => t.getId() === input.prev_hash); // TODO check
+            if (refTx && refTx.outs[input.prev_index]) {
+                input.amount = refTx.outs[input.prev_index].value;
             }
         }
     });

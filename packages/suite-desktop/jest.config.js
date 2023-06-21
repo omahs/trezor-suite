@@ -3,13 +3,13 @@ module.exports = {
     moduleFileExtensions: ['js', 'ts', 'tsx'],
     coverageDirectory: './coverage',
     collectCoverage: true,
-    collectCoverageFrom: ['<rootDir>/src/http.ts'],
+    collectCoverageFrom: ['<rootDir>/src/libs/*'],
     coverageThreshold: {
         global: {
-            statements: 38,
-            branches: 0,
-            functions: 50,
-            lines: 40,
+            statements: 25,
+            branches: 25,
+            functions: 20,
+            lines: 25,
         },
     },
     modulePathIgnorePatterns: ['node_modules', '<rootDir>/lib', '<rootDir>/libDev'],

@@ -3,7 +3,7 @@ import url from 'url';
 import { TOR_URLS } from '@trezor/urls';
 import { isDevEnv, isCodesignBuild } from '@suite-common/suite-utils';
 
-const getAppName = () => {
+export const getAppName = () => {
     const appName = 'Trezor Suite';
 
     if (!isCodesignBuild) {

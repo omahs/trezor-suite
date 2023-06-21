@@ -91,4 +91,40 @@ describe('logger', () => {
         const logFile = fs.readFileSync(output, { encoding: 'utf8' });
         expect(logFile).toBe('ERROR(test): A\nWARN(test): B\nINFO(test): C\nDEBUG(test): D\n');
     });
+
+    it('No output file error', async () => {
+        const logger = new Logger('debug', {
+            ...testOptions,
+            outputFile: undefined,
+            writeToDisk: true,
+        });
+
+        logger.exit();
+
+        await new Promise(res => setTimeout(res, 1000));
+
+        expect(spy.mock.calls).toEqual([
+            [
+                "ERROR(logger): Can't write log to file because outputFile is not properly set (undefined)",
+            ],
+        ]);
+    });
+
+    it('No output path error', async () => {
+        const logger = new Logger('debug', {
+            ...testOptions,
+            outputPath: undefined,
+            writeToDisk: true,
+        });
+
+        logger.exit();
+
+        await new Promise(res => setTimeout(res, 1000));
+
+        expect(spy.mock.calls).toEqual([
+            [
+                "ERROR(logger): Can't write log to file because outputPath is not properly set (undefined)",
+            ],
+        ]);
+    });
 });

@@ -16,7 +16,7 @@ import { clearAppCache, initUserData } from './libs/user-data';
 import { initModules, mainThreadEmitter } from './modules';
 import { init as initTorModule } from './modules/tor';
 import { createInterceptor } from './libs/request-interceptor';
-import { hangDetect } from './hang-detect';
+import { hangDetect } from './libs/hang-detect';
 import { Logger } from './libs/logger';
 
 // @ts-expect-error using internal electron API to set suite version in dev mode correctly

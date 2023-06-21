@@ -1,5 +1,5 @@
+const schemes = require('./src/uriSchemes.json');
 const { suiteVersion } = require('../suite/package.json');
-const schemes = require('./uriSchemes.json');
 
 const isCodesignBuild = process.env.IS_CODESIGN_BUILD === 'true';
 

@@ -24,6 +24,6 @@
         "noUnusedParameters": true,
         "noImplicitAny": true
     },
-    "include": ["**/*.ts"],
+    "include": ["**/*.ts", "uriSchemes.json"],
     "exclude": ["**/*.js"]
 }

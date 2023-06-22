@@ -41,6 +41,15 @@ const config: webpack.Configuration = {
                 },
             },
             {
+                test: /sharedLoggerWorker/i,
+                loader: 'worker-loader',
+                // issuer: /workers\/workers-*/i, // replace import ONLY in /workers\/workers- not @trezor/transport
+                options: {
+                    worker: 'SharedWorker',
+                    filename: './workers/shared-logger-worker.js',
+                },
+            },
+            {
                 test: /\workers\/blockbook\/index/i,
                 loader: 'worker-loader',
                 options: {

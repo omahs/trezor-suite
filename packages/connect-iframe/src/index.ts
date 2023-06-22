@@ -24,17 +24,30 @@ import {
 import { Core, init as initCore, initTransport } from '@trezor/connect/src/core';
 import { DataManager } from '@trezor/connect/src/data/DataManager';
 import { config } from '@trezor/connect/src/data/config';
-import { initLog } from '@trezor/connect/src/utils/debug';
+import { LogWriter, createLogger } from '@trezor/connect/src/utils/debug';
 import { getOrigin } from '@trezor/connect/src/utils/urlUtils';
 import { suggestBridgeInstaller } from '@trezor/connect/src/data/transportInfo';
 import { suggestUdevInstaller } from '@trezor/connect/src/data/udevInfo';
 import { storage, getSystemInfo, getInstallerPackage } from '@trezor/connect-common';
 import { parseConnectSettings, isOriginWhitelisted } from './connectSettings';
+import LogWorker from './sharedLoggerWorker';
 
 let _core: Core | undefined;
 
+const logWorker = new LogWorker();
+logWorker.port.start();
+
+const logWriter = (): LogWriter => {
+    return {
+        add: (message: object) => logWorker.port.postMessage({ type: 'add-log', data: message }),
+    };
+};
+
+const initLog = createLogger(logWriter);
+
 // custom log
 const _log = initLog('IFrame');
+
 let _popupMessagePort: (MessagePort | BroadcastChannel) | undefined;
 
 // Wrapper which listens to events from Core

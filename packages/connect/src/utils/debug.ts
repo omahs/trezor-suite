@@ -14,11 +14,15 @@ const colors: Record<string, string> = {
     '@trezor/transport': 'color: #bada55; background: #000;',
 };
 
-type LogMessage = {
+export type LogMessage = {
     level: string;
     prefix: string;
     message: any[];
     timestamp: number;
+};
+
+export type LogWriter = {
+    add: (message: LogMessage) => void;
 };
 
 const MAX_ENTRIES = 100;
@@ -28,12 +32,16 @@ class Log {
     enabled: boolean;
     css: string;
     messages: LogMessage[];
+    logWriter: any;
 
-    constructor(prefix: string, enabled: boolean) {
+    constructor(prefix: string, enabled: boolean, logWriter?: LogWriter) {
         this.prefix = prefix;
         this.enabled = enabled;
         this.messages = [];
         this.css = typeof window !== 'undefined' && colors[prefix] ? colors[prefix] : '';
+        if (logWriter) {
+            this.logWriter = logWriter;
+        }
     }
 
     addMessage(level: string, prefix: string, ...args: any[]) {
@@ -43,6 +51,9 @@ class Log {
             message: args,
             timestamp: Date.now(),
         });
+        if (this.logWriter) {
+            this.logWriter.add(this.messages[0]);
+        }
         if (this.messages.length > MAX_ENTRIES) {
             this.messages.shift();
         }
@@ -83,10 +94,17 @@ class Log {
 
 const _logs: { [k: string]: Log } = {};
 
-export const initLog = (prefix: string, enabled?: boolean) => {
-    const instance = new Log(prefix, !!enabled);
+export const initLog = (prefix: string, enabled?: boolean, logWriter?: LogWriter) => {
+    const instance = new Log(prefix, !!enabled, logWriter);
     _logs[prefix] = instance;
     return instance;
+};
+
+// Create a wrapper function that allow to encapsulate a logger instance.
+// This is useful when we want to have a logger instance for all modules.
+export const createLogger = (logWriter: any) => {
+    const writer = logWriter();
+    return (prefix: string, enabled?: boolean) => initLog(prefix, enabled, writer);
 };
 
 export const enableLog = (enabled?: boolean) => {

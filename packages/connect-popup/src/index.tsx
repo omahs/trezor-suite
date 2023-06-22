@@ -12,6 +12,7 @@ import {
     MethodResponseMessage,
 } from '@trezor/connect';
 import { config } from '@trezor/connect/lib/data/config';
+import { createLogger, LogWriter } from '@trezor/connect/src/utils/debug';
 
 import { reactEventBus } from '@trezor/connect-ui/src/utils/eventBus';
 import { analytics, EventType } from '@trezor/connect-analytics';
@@ -26,6 +27,21 @@ import {
     renderConnectUI,
 } from './view/common';
 import { isPhishingDomain } from './utils/isPhishingDomain';
+
+import LogWorker from '../../connect-iframe/src/sharedLoggerWorker';
+
+const logWorker = new LogWorker();
+logWorker.port.start();
+
+const logWriter = (): LogWriter => {
+    return {
+        add: (message: object) => logWorker.port.postMessage({ type: 'add-log', data: message }),
+    };
+};
+
+const initLog = createLogger(logWriter);
+
+const log = initLog('popup');
 
 let handshakeTimeout: ReturnType<typeof setTimeout>;
 
@@ -49,6 +65,7 @@ const handleMessage = (
         | (Omit<MethodResponseMessage, 'payload'> & { payload?: { error: string; code?: string } })
     >,
 ) => {
+    log.debug('handleMessage', event);
     const { data } = event;
     if (!data) return;
 
@@ -197,6 +214,7 @@ const handleMessage = (
 
 // handle POPUP.INIT message from window.opener
 const init = async (payload: PopupInit['payload']) => {
+    log.debug('init', payload);
     if (!payload) return;
 
     if (!payload.systemInfo) {
@@ -225,6 +243,7 @@ const init = async (payload: PopupInit['payload']) => {
 
 // handle POPUP.HANDSHAKE message from iframe
 const handshake = (handshake: PopupHandshake) => {
+    log.debug('handshake', handshake);
     const { payload } = handshake;
     if (!payload) return;
 
@@ -255,6 +274,7 @@ const handshake = (handshake: PopupHandshake) => {
 };
 
 const onLoad = () => {
+    log.debug('onLoad');
     postMessageToParent(createPopupMessage(POPUP.LOADED));
 
     handshakeTimeout = setTimeout(

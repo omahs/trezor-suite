@@ -1,5 +1,6 @@
 import type { BlockchainSettings } from '@trezor/blockchain-link';
 import type { Transport } from '@trezor/transport';
+import type { LogMessage } from '../utils/debug';
 
 export type { SystemInfo } from '@trezor/connect-common';
 export interface Manifest {
@@ -35,4 +36,6 @@ export interface ConnectSettings {
     env: 'node' | 'web' | 'webextension' | 'electron' | 'react-native';
     timestamp: number;
     proxy?: Proxy;
+    // TODO: this approach can be used only when not serializing settings.
+    logWriter?: (message: LogMessage) => void;
 }

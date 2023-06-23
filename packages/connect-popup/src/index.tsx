@@ -12,7 +12,7 @@ import {
     MethodResponseMessage,
 } from '@trezor/connect';
 import { config } from '@trezor/connect/lib/data/config';
-import { createLogger, LogWriter } from '@trezor/connect/src/utils/debug';
+import { createLoggerFactory, LogWriter } from '@trezor/connect/src/utils/debug';
 
 import { reactEventBus } from '@trezor/connect-ui/src/utils/eventBus';
 import { analytics, EventType } from '@trezor/connect-analytics';
@@ -33,13 +33,11 @@ import LogWorker from '../../connect-iframe/src/sharedLoggerWorker';
 const logWorker = new LogWorker();
 logWorker.port.start();
 
-const logWriter = (): LogWriter => {
-    return {
-        add: (message: object) => logWorker.port.postMessage({ type: 'add-log', data: message }),
-    };
-};
+const logWriter = (): LogWriter => ({
+    add: (message: object) => logWorker.port.postMessage({ type: 'add-log', data: message }),
+});
 
-const initLog = createLogger(logWriter);
+const initLog = createLoggerFactory(logWriter);
 
 const log = initLog('popup');
 

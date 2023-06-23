@@ -24,7 +24,7 @@ import {
 import { Core, init as initCore, initTransport } from '@trezor/connect/src/core';
 import { DataManager } from '@trezor/connect/src/data/DataManager';
 import { config } from '@trezor/connect/src/data/config';
-import { LogWriter, createLogger } from '@trezor/connect/src/utils/debug';
+import { LogWriter, createLoggerFactory } from '@trezor/connect/src/utils/debug';
 import { getOrigin } from '@trezor/connect/src/utils/urlUtils';
 import { suggestBridgeInstaller } from '@trezor/connect/src/data/transportInfo';
 import { suggestUdevInstaller } from '@trezor/connect/src/data/udevInfo';
@@ -37,13 +37,11 @@ let _core: Core | undefined;
 const logWorker = new LogWorker();
 logWorker.port.start();
 
-const logWriter = (): LogWriter => {
-    return {
-        add: (message: object) => logWorker.port.postMessage({ type: 'add-log', data: message }),
-    };
-};
+const logWriter = (): LogWriter => ({
+    add: (message: object) => logWorker.port.postMessage({ type: 'add-log', data: message }),
+});
 
-const initLog = createLogger(logWriter);
+const initLog = createLoggerFactory(logWriter);
 
 // custom log
 const _log = initLog('IFrame');
@@ -187,6 +185,14 @@ const postMessage = (message: CoreMessage) => {
     }
 
     if (usingPopup && _popupMessagePort) {
+        console.log('message in connect-iframe postMessage  ', message);
+        console.log('message.payload', message?.payload);
+        console.log('message.payload.settings', message?.payload?.settings);
+        console.log('message.payload.settings.logWriter', message?.payload?.settings?.logWriter);
+        if (message?.payload?.settings?.logWriter) {
+            delete message.payload.settings.logWriter;
+        }
+        // delete message.payload.settings.logWriter;
         _popupMessagePort.postMessage(message);
     }
 
@@ -258,7 +264,7 @@ const init = async (payload: IFrameInit['payload'], origin: string) => {
 
     try {
         // initialize core
-        _core = await initCore(parsedSettings);
+        _core = await initCore({ ...parsedSettings, logWriter });
         _core.on(CORE_EVENT, postMessage);
 
         // initialize transport and wait for the first transport event (start or error)

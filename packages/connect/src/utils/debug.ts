@@ -102,7 +102,7 @@ export const initLog = (prefix: string, enabled?: boolean, logWriter?: LogWriter
 
 // Create a wrapper function that allow to encapsulate a logger instance.
 // This is useful when we want to have a logger instance for all modules.
-export const createLogger = (logWriter: any) => {
+export const createLoggerFactory = (logWriter: any) => {
     const writer = logWriter();
     return (prefix: string, enabled?: boolean) => initLog(prefix, enabled, writer);
 };

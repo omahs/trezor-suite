@@ -30,7 +30,7 @@ import { getMethod } from './method';
 
 import { create as createDeferred, Deferred } from '../utils/deferred';
 import { resolveAfter } from '../utils/promiseUtils';
-import { initLog, enableLog } from '../utils/debug';
+import { initLog, enableLog, createLoggerFactory } from '../utils/debug';
 import { dispose as disposeBackend } from '../backend/BlockchainLink';
 import { InteractionTimeout } from '../utils/interactionTimeout';
 
@@ -1013,6 +1013,15 @@ export const initCore = () => {
  * @memberof Core
  */
 export const init = async (settings: ConnectSettings) => {
+    console.log('init in connect core index.ts');
+    console.log('settings', settings);
+
+    const initLog = createLoggerFactory(settings.logWriter);
+
+    // custom log
+    const _log = initLog('connect');
+    _log.debug('test debug');
+
     try {
         await DataManager.load(settings);
         enableLog(DataManager.getSettings('debug'));

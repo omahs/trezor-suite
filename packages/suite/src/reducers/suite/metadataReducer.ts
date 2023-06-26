@@ -94,12 +94,13 @@ export const selectLabelingDataForSelectedAccount = (state: {
     const provider = selectSelectedProviderForLabels(state);
     const { selectedAccount } = state.wallet;
 
-        const metadataKeys = selectedAccount?.account?.metadata[METADATA.ENCRYPTION_VERSION];
-        if (!metadataKeys || !metadataKeys.fileName || !provider?.data[metadataKeys.fileName])
-            return initialAccountLabels;
-
-        return provider.data[metadataKeys.fileName] as AccountLabels;
+    const metadataKeys = selectedAccount?.account?.metadata[METADATA.ENCRYPTION_VERSION];
+    if (!metadataKeys || !metadataKeys.fileName || !provider?.data[metadataKeys.fileName]) {
+        return initialAccountLabels;
     }
+
+    return provider.data[metadataKeys.fileName] as AccountLabels;
+};
 
 /**
  * Select metadata of type 'labels' for requested account

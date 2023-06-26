@@ -1,5 +1,5 @@
 import { convertCryptoToFiatAmount } from '../convertCryptoToFiatAmount';
-import { coins } from './fixtures/coins';
+import { coins } from './__fixtures__/coins';
 
 describe('Convert crypto to fiat amount', () => {
     it('converts correctly', () => {

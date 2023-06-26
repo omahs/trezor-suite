@@ -6,13 +6,13 @@ module.exports = {
     rootDir: './',
     coverageDirectory: './coverage',
     collectCoverage: true,
-    collectCoverageFrom: ['<rootDir>/src/**'],
+    collectCoverageFrom: ['<rootDir>/src/**', '<rootDir>/scripts/**'],
     coverageThreshold: {
         global: {
-            statements: 40,
-            branches: 35,
-            functions: 50,
-            lines: 40,
+            statements: 60,
+            branches: 70,
+            functions: 55,
+            lines: 65,
         },
     },
 };

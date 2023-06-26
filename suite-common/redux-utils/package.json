@@ -8,7 +8,7 @@
     "scripts": {
         "lint:js": "yarn g:eslint '**/*.{ts,tsx,js}'",
         "type-check": "tsc --build",
-        "test:unit": "jest -c ../../jest.config.base.js"
+        "test:unit": "jest"
     },
     "dependencies": {
         "@reduxjs/toolkit": "1.9.5",

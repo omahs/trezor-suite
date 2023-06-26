@@ -45,7 +45,7 @@ const breadcrumbActions = [
     DISCOVERY.COMPLETE,
     SUITE.UPDATE_SELECTED_DEVICE,
     SUITE.REMEMBER_DEVICE,
-    METADATA.SET_PROVIDER,
+    METADATA.ADD_PROVIDER,
     walletSettingsActions.changeNetworks.type,
     TRANSPORT.START,
     TRANSPORT.ERROR,

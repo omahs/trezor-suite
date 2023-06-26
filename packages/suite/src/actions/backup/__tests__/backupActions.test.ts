@@ -142,4 +142,34 @@ describe('Backup Actions', () => {
             payload: { type: 'backup-failed' },
         });
     });
+
+    it('backup error - no device', async () => {
+        require('@trezor/connect').setTestFixtures({
+            success: false,
+            payload: { error: 'avadakedavra' },
+        });
+
+        const state = getInitialState({});
+        // @ts-expect-error
+        const store = mockStore({ ...state, suite: { ...state.suite, device: undefined } });
+        await store.dispatch(connectInitThunk());
+
+        await store.dispatch(
+            backupActions.backupDevice({ device: store.getState().suite.device } as CommonParams),
+        );
+
+        expect(store.getActions().shift()).toMatchObject({
+            type: connectInitThunk.pending.type,
+            payload: undefined,
+        });
+        expect(store.getActions().shift()).toMatchObject({
+            type: connectInitThunk.fulfilled.type,
+            payload: undefined,
+        });
+
+        expect(store.getActions().shift()).toMatchObject({
+            type: notificationsActions.addToast.type,
+            payload: { type: 'error', error: 'Device not connected' },
+        });
+    });
 });

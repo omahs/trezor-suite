@@ -24,17 +24,27 @@ import {
 import { Core, initCore, initTransport } from '@trezor/connect/src/core';
 import { DataManager } from '@trezor/connect/src/data/DataManager';
 import { config } from '@trezor/connect/src/data/config';
-import { initLog } from '@trezor/connect/src/utils/debug';
+import { LogWriter, initLog } from '@trezor/connect/src/utils/debug';
 import { getOrigin } from '@trezor/connect/src/utils/urlUtils';
 import { suggestBridgeInstaller } from '@trezor/connect/src/data/transportInfo';
 import { suggestUdevInstaller } from '@trezor/connect/src/data/udevInfo';
 import { storage, getSystemInfo, getInstallerPackage } from '@trezor/connect-common';
 import { parseConnectSettings, isOriginWhitelisted } from './connectSettings';
+// @ts-expect-error (typescript does not know this is worker constructor, this is done by webpack)
+import LogWorker from './sharedLoggerWorker';
 
 let _core: Core | undefined;
 
+const logWorker = new LogWorker();
+logWorker.port.start();
+
+const logWriter = (): LogWriter => ({
+    add: (message: object) => logWorker.port.postMessage({ type: 'add-log', data: message }),
+});
+
 // custom log
 const _log = initLog('IFrame');
+
 let _popupMessagePort: (MessagePort | BroadcastChannel) | undefined;
 
 // Wrapper which listens to events from Core
@@ -245,7 +255,7 @@ const init = async (payload: IFrameInit['payload'], origin: string) => {
 
     try {
         // initialize core
-        _core = await initCore(parsedSettings);
+        _core = await initCore(parsedSettings, logWriter);
         _core.on(CORE_EVENT, postMessage);
 
         // initialize transport and wait for the first transport event (start or error)

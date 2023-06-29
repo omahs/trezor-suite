@@ -63,13 +63,16 @@ class Log {
     }
 
     addMessage(level: string, prefix: string, css: string, ...args: any[]) {
-        this.messages.push({
+        const message = {
             level,
             prefix,
             css,
             message: args,
             timestamp: Date.now(),
-        });
+        };
+
+        this.messages.push(message);
+
         if (this.logWriter) {
             const { level, prefix, timestamp, css, ...rest } = message;
 

@@ -388,6 +388,7 @@ export const start =
             // metadata are enabled in settings but metadata master key does not exist for this device
             // try to generate device metadata master key if passphrase is not used
             if (!authConfirm && metadataEnabled) {
+                console.debug('metadata init from discoveryActions 391');
                 await dispatch(metadataActions.init());
             }
 
@@ -446,7 +447,8 @@ export const start =
             // if previous discovery status was running (typically after application start or when user added a new account)
             // trigger fetch metadata; necessary to load account labels
             if (discovery.status === DISCOVERY.STATUS.RUNNING) {
-                dispatch(metadataActions.fetchMetadata(deviceState));
+                console.debug('metadata init from discoveryActions 449');
+                dispatch(metadataActions.init());
             }
 
             dispatch(
@@ -505,6 +507,7 @@ export const start =
                     }),
                 );
                 // try to generate device metadata master key
+                console.debug('metadata init from discoveryActions 510');
                 await dispatch(metadataActions.init());
             }
             if (currentDiscovery.status === DISCOVERY.STATUS.RUNNING) {

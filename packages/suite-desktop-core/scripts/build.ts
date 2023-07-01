@@ -6,7 +6,8 @@ import { sync } from 'glob';
 import { build, PluginBuild } from 'esbuild';
 
 import uriSchemes from '../uriSchemes.json';
-import pkg from '../package.json';
+
+const pkg = require('../../suite-desktop/package.json');
 
 // To prevent unnecessary type check of whole suite package. It's a static file so require is
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -64,19 +65,7 @@ console.log('[Electron Build] Starting...');
 console.log(`[Electron Build] Mode: ${isDev ? 'development' : 'production'}`);
 console.log(`[Electron Build] Using mocks: ${useMocks}`);
 
-// All local packages that doesn't have "build:libs" and used in packages/suite-desktop/src
-// must be built and not included in electron node_modules, because they are in TS.
-// Normal src/ folder is fine, because it's builded by webpack.
-const builtTrezorDependencies = [
-    '@trezor/ipc-proxy',
-    '@trezor/urls',
-    '@trezor/utils',
-    '@trezor/node-utils',
-];
-
-const dependencies = Object.keys(pkg.dependencies).filter(
-    name => !(name.startsWith('@suite-common/') || builtTrezorDependencies.includes(name)),
-);
+const dependencies = Object.keys(pkg.dependencies);
 const devDependencies = Object.keys(pkg.devDependencies);
 
 const electronExternalDependencies = [...dependencies, ...devDependencies];
@@ -92,7 +81,7 @@ build({
     tsconfig: path.join(source, 'tsconfig.json'),
     sourcemap: isDev,
     minify: !isDev,
-    outdir: path.join(__dirname, '..', 'dist'),
+    outdir: path.join(__dirname, '../../suite-desktop', 'dist'),
     define: {
         'process.env.NODE_ENV': JSON.stringify(NODE_ENV),
         'process.env.COMMITHASH': JSON.stringify(gitRevision),

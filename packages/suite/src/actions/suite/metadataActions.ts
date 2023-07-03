@@ -349,6 +349,7 @@ export const fetchMetadata =
         }
 
         const { fileName, aesKey } = entity[encryptionVersion];
+        console.debug('metadata: fatching file: ', fileName);
 
         const response = await providerInstance.getFileContent(fileName);
 
@@ -472,7 +473,7 @@ export const setAccountMetadataKey =
         }
         try {
             const metaKey = metadataUtils.deriveMetadataKey(deviceMetaKey, account.metadata.key);
-            const fileName = `${metadataUtils.deriveFilename(metaKey)}.mtdt`;
+            const fileName = metadataUtils.deriveFilenameForLabeling(metaKey, encryptionVersion);
 
             const aesKey = metadataUtils.deriveAesKey(metaKey);
             return {
@@ -592,7 +593,9 @@ const encryptAndSaveMetadata =
                 },
                 aesKey,
             );
-            const result = await providerInstance.setFileContent(`${fileName}`, encrypted);
+
+            // we started postfixing files
+            const result = await providerInstance.setFileContent(fileName, encrypted);
             if (!result.success) {
                 dispatch(
                     handleProviderError({
@@ -788,7 +791,10 @@ export const setDeviceMetadataKey =
 
             const [stateAddress] = device.state.split('@'); // address@device_id:instance
             const metaKey = metadataUtils.deriveMetadataKey(result.payload.value, stateAddress);
-            const fileName = `${metadataUtils.deriveFilename(metaKey)}.mtdt`;
+            const fileName = `${metadataUtils.deriveFilenameForLabeling(
+                metaKey,
+                encryptionVersion,
+            )}`;
             const aesKey = metadataUtils.deriveAesKey(metaKey);
 
             dispatch({
@@ -838,7 +844,7 @@ export const addMetadata = (payload: MetadataAddPayload) => (dispatch: Dispatch)
     return dispatch(addAccountMetadata(payload));
 };
 
-const getEntitiesThatNeedMigration =
+const getEntitiesWithoutFileInProvider =
     (deviceState: string, files: string[]) => (dispatch: Dispatch) => {
         const allEntitites = dispatch(getLabelableEntitities(deviceState));
         const [needMigration] = arrayPartition(
@@ -894,13 +900,20 @@ const handleEncryptionVersionMigration = () => async (dispatch: Dispatch, getSta
         return;
     }
 
+    if (files.every(file => file.endsWith(`_v${METADATA.ENCRYPTION_VERSION}`))) {
+        console.debug(
+            'metadata migration: all files in provider have latest version postfix, stopping here',
+        );
+        return;
+    }
+
     const { device } = getState().suite;
     if (!device?.state || device.metadata.status !== 'enabled') {
         console.error('metadata migration: device unexpected state'); // or throw, or error? i never know
         return;
     }
     // gather all labelable enetitites from state
-    let needMigration = dispatch(getEntitiesThatNeedMigration(device.state, files));
+    let needMigration = dispatch(getEntitiesWithoutFileInProvider(device.state, files));
 
     console.debug('metadata migration: entities that need to be migrated', needMigration);
     // each labelable entitity has file created for the latest version of encryption. no migration needed
@@ -915,6 +928,11 @@ const handleEncryptionVersionMigration = () => async (dispatch: Dispatch, getSta
     // 1. select lower encryption version
     const prevEncryptionVersion = (METADATA.ENCRYPTION_VERSION - 1) as MetadataEncryptionVersion;
 
+    if (prevEncryptionVersion < 1) {
+        console.error(`metadata migration: can not migrate to version ${prevEncryptionVersion}!!!`);
+        return;
+    }
+
     console.debug(
         'metadata migration: filling in keys for encryption version: ',
         prevEncryptionVersion,
@@ -927,7 +945,7 @@ const handleEncryptionVersionMigration = () => async (dispatch: Dispatch, getSta
     dispatch(syncMetadataKeys(prevEncryptionVersion));
 
     // 3. gather labelable entities with already updated keys
-    needMigration = dispatch(getEntitiesThatNeedMigration(device.state, files));
+    needMigration = dispatch(getEntitiesWithoutFileInProvider(device.state, files));
 
     // 4. for each entity
     //   - fetch metadata associated with lower encryption version filenames
@@ -996,7 +1014,8 @@ const handleEncryptionVersionMigration = () => async (dispatch: Dispatch, getSta
     });
 
     // NOTE: I understand that this is not the right layer to rate limit access to provider API. It should be handled in provider service itself but
-    // I don't have free hands to do it now. So I am running all requests in series as a workaround now.
+    // I don't have free hands to do it now. So I am running all requests in series as a workaround now. Correct solution would be
+    // implementing provider.batchWrite and do batching if possible and if not, use single requests with some rate limiting
 
     // NOTE2: If application exits in the process of running this, no hardship should happen. Migration will be left unfinished meaning that it will
     // prompt user next time again for the remaining 'labelableEntitites'
@@ -1027,12 +1046,13 @@ export const init =
             return false;
         }
 
+        dispatch({ type: METADATA.SET_INITIATING, payload: true });
+
         // 2. set device metadata key (master key). Sometimes, if state is not present
         if (
             device.metadata.status === 'disabled' ||
             (device.metadata.status === 'cancelled' && force && device?.connected)
         ) {
-            dispatch({ type: METADATA.SET_INITIATING, payload: true });
             await dispatch(setDeviceMetadataKey(METADATA.ENCRYPTION_VERSION));
         }
 
@@ -1055,10 +1075,6 @@ export const init =
             getState().suite.device?.metadata.status === 'enabled' &&
             !getState().metadata.providers?.length
         ) {
-            if (!getState().metadata.initiating) {
-                dispatch({ type: METADATA.SET_INITIATING, payload: true });
-            }
-
             const providerResult = await dispatch(initProvider());
             if (!providerResult) {
                 dispatch({ type: METADATA.SET_INITIATING, payload: false });
@@ -1070,10 +1086,12 @@ export const init =
 
         // 4. migration
         await dispatch(handleEncryptionVersionMigration());
-
+        console.debug('metadata migration: finished');
         // 5. fetch metadata
+        console.debug('metadata: fetchAndSaveMetadata call');
+        await dispatch(fetchAndSaveMetadata(device.state));
+        console.debug('metadata: fetchAndSaveMetadata done');
         if (getState().metadata.initiating) {
-            await dispatch(fetchAndSaveMetadata(device.state));
             dispatch({ type: METADATA.SET_INITIATING, payload: false });
         }
 
@@ -1081,7 +1099,7 @@ export const init =
         if (device.state && !fetchIntervals[device.state]) {
             fetchIntervals[device.state] = setInterval(() => {
                 const { device } = getState().suite;
-                if (!getState().suite.online || !device.state) {
+                if (!getState().suite.online || !device?.state) {
                     return;
                 }
                 dispatch(fetchAndSaveMetadata(device.state));

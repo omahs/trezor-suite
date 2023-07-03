@@ -228,6 +228,8 @@ export const imagePathToHex = async (imagePath: string, deviceModel: DeviceModel
 export const isHomescreenSupportedOnDevice = (device: TrezorDevice) => {
     const deviceModel = getDeviceModel(device);
 
+    if (deviceModel !== DeviceModel.TT) return true;
+
     return (
         deviceModel !== DeviceModel.TT ||
         (deviceModel === DeviceModel.TT && device.features?.homescreen_format === 'Jpeg240x240')

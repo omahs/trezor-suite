@@ -286,7 +286,7 @@ export class PopupManager extends EventEmitter {
         }
     }
 
-    close() {
+    close(force?: boolean) {
         this.locked = false;
         this.popupPromise = undefined;
 
@@ -324,7 +324,7 @@ export class PopupManager extends EventEmitter {
             chrome.tabs.remove(this.popupWindow.id, () => {
                 _e = chrome.runtime.lastError;
             });
-        } else if (!this.settings.debug) {
+        } else if (!this.settings.debug || force) {
             this.popupWindow.close();
             this.popupWindow = null;
         }

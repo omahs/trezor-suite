@@ -59,11 +59,13 @@ const manifest = (data: Manifest) => {
 };
 
 const dispose = () => {
+    console.log('=== connect-web === dispose', _popupManager);
     eventEmitter.removeAllListeners();
     iframe.dispose();
     _settings = parseConnectSettings();
+
     if (_popupManager) {
-        _popupManager.close();
+        _popupManager.close(true);
     }
     return Promise.resolve(undefined);
 };

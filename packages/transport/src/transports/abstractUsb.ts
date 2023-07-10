@@ -85,56 +85,55 @@ export abstract class AbstractUsbTransport extends AbstractTransport {
     }
 
     public acquire({ input }: { input: AcquireInput }) {
-        return this.scheduleAction(async () => {
-            const { path } = input;
+        return this.scheduleAction(
+            async () => {
+                const { path } = input;
 
-            if (this.listening) {
-                this.listenPromise[path] = createDeferred<string>();
-            }
+                if (this.listening) {
+                    this.listenPromise[path] = createDeferred<string>();
+                    this.listenPromise[path].promise
+                        .catch(err => err)
+                        .finally(() => {
+                            delete this.listenPromise[path];
+                        });
+                }
 
-            const acquireIntentResponse = await this.sessionsClient.acquireIntent(input);
-            if (!acquireIntentResponse.success) {
+                const acquireIntentResponse = await this.sessionsClient.acquireIntent(input);
+
+                if (!acquireIntentResponse.success) {
+                    if (this.acquirePromise) {
+                        this.acquirePromise.resolve(undefined);
+                    }
+                    return this.error({ error: acquireIntentResponse.error });
+                }
+
+                this.acquiredUnconfirmed[path] = acquireIntentResponse.payload.session;
+
+                const reset = !!input.previous;
+                const openDeviceResult = await this.transportInterface.openDevice(path, reset);
+
+                if (!openDeviceResult.success) {
+                    if (this.listenPromise) {
+                        this.listenPromise[path].reject(new Error(openDeviceResult.error));
+                    }
+                    return openDeviceResult;
+                }
+
+                this.sessionsClient.acquireDone({ path });
+
                 if (this.acquirePromise) {
                     this.acquirePromise.resolve(undefined);
                 }
-                return this.error({ error: acquireIntentResponse.error });
-            }
-            this.acquiredUnconfirmed[path] = acquireIntentResponse.payload.session;
 
-            const reset = !!input.previous;
-            const openDeviceResult = await this.transportInterface.openDevice(path, reset);
-            if (!openDeviceResult.success) {
-                if (this.listenPromise) {
-                    this.listenPromise[path].reject(new Error(openDeviceResult.error));
+                if (!this.listenPromise[path]) {
+                    return this.success(acquireIntentResponse.payload.session);
                 }
-                return openDeviceResult;
-            }
 
-            this.sessionsClient.acquireDone({ path });
-
-            if (this.acquirePromise) {
-                this.acquirePromise.resolve(undefined);
-            }
-
-            if (!this.listenPromise[path]) {
-                return this.success(acquireIntentResponse.payload.session);
-            }
-
-            return this.listenPromise[path].promise
-                .then(sessionId => {
-                    delete this.listenPromise[path];
-                    return this.success(sessionId);
-                })
-                .catch(err => {
-                    delete this.listenPromise[path];
-                    return this.unknownError(err, [
-                        ERRORS.DEVICE_DISCONNECTED_DURING_ACTION,
-                        ERRORS.SESSION_WRONG_PREVIOUS,
-                        ERRORS.DEVICE_NOT_FOUND,
-                        ERRORS.INTERFACE_UNABLE_TO_OPEN_DEVICE,
-                    ]);
-                });
-        });
+                return this.listenPromise[path].promise.then(sessionId => this.success(sessionId));
+            },
+            undefined,
+            [ERRORS.DEVICE_DISCONNECTED_DURING_ACTION, ERRORS.SESSION_WRONG_PREVIOUS],
+        );
     }
 
     public release(session: string) {

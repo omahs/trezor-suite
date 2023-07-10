@@ -427,7 +427,11 @@ export abstract class AbstractTransport extends TypedEmitter<{
         return { signal: localAbortController.signal, abort };
     };
 
-    protected scheduleAction = <T>(action: ScheduledAction<T>, params?: ScheduleActionParams) => {
+    protected scheduleAction = <T, E extends AnyError>(
+        action: ScheduledAction<T>,
+        params?: ScheduleActionParams,
+        errors?: E[],
+    ) => {
         const { signal, abort } = this.createLocalAbortController();
         return {
             promise: scheduleAction(action, {
@@ -435,9 +439,13 @@ export abstract class AbstractTransport extends TypedEmitter<{
                 timeout: ACTION_TIMEOUT,
                 ...params,
             })
-                .catch(err =>
-                    unknownError(err, [ERRORS.ABORTED_BY_TIMEOUT, ERRORS.ABORTED_BY_SIGNAL]),
-                )
+                .catch(err => {
+                    const expectedErrors = [ERRORS.ABORTED_BY_TIMEOUT, ERRORS.ABORTED_BY_SIGNAL];
+                    if (errors) {
+                        (expectedErrors as E[]).push(...errors);
+                    }
+                    return unknownError(err, expectedErrors);
+                })
                 .finally(() => {
                     this.abortController.signal.removeEventListener('abort', abort);
                 }),

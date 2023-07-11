@@ -4,23 +4,23 @@ import { SUITE, ROUTER } from 'src/actions/suite/constants';
 import suiteReducer from 'src/reducers/suite/suiteReducer';
 import modalReducer from 'src/reducers/suite/modalReducer';
 import routerReducer from 'src/reducers/suite/routerReducer';
-import deviceReducer from 'src/reducers/suite/deviceReducer';
+import { prepareDeviceReducer } from 'src/reducers/suite/deviceReducer';
+import walletReducers from 'src/reducers/wallet';
+import { init } from 'src/actions/suite/initAction';
+import suiteMiddleware from 'src/middlewares/suite/suiteMiddleware';
+import type { AppState } from 'src/types/suite';
+import { extraDependencies } from 'src/support/extraDependencies';
+
+import {
+    validJws,
+    DEV_JWS_PUBLIC_KEY,
+} from '@suite-common/message-system/src/__fixtures__/messageSystemActions';
 import {
     prepareMessageSystemReducer,
     messageSystemActions,
     initMessageSystemThunk,
     fetchConfigThunk,
 } from '@suite-common/message-system';
-import walletReducers from 'src/reducers/wallet';
-import { init } from 'src/actions/suite/initAction';
-import suiteMiddleware from 'src/middlewares/suite/suiteMiddleware';
-import {
-    validJws,
-    DEV_JWS_PUBLIC_KEY,
-} from '@suite-common/message-system/src/__fixtures__/messageSystemActions';
-import type { AppState } from 'src/types/suite';
-import { extraDependencies } from 'src/support/extraDependencies';
-
 import { connectInitThunk } from '@suite-common/connect-init';
 import {
     blockchainActions,
@@ -31,6 +31,7 @@ import { analyticsActions, prepareAnalyticsReducer } from '@suite-common/analyti
 
 const analyticsReducer = prepareAnalyticsReducer(extraDependencies);
 const messageSystemReducer = prepareMessageSystemReducer(extraDependencies);
+const deviceReducer = prepareDeviceReducer(extraDependencies);
 
 process.env.JWS_PUBLIC_KEY = DEV_JWS_PUBLIC_KEY;
 jest.mock('@trezor/connect', () => global.JestMocks.getTrezorConnect({}));

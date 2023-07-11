@@ -1,28 +1,31 @@
 import { configureStore } from 'src/support/tests/configureStore';
-
 import { Middleware } from 'redux';
-import * as storageActions from '../storageActions';
-import * as suiteActions from '../suiteActions';
 import * as walletSettingsActions from 'src/actions/settings/walletSettingsActions';
 import * as discoveryActions from 'src/actions/wallet/discoveryActions';
-import { disableAccountsThunk, transactionsActions } from '@suite-common/wallet-core';
 import * as SUITE from 'src/actions/suite/constants/suiteConstants';
-
 import { accountsReducer, fiatRatesReducer, transactionsReducer } from 'src/reducers/wallet';
 import walletSettingsReducer from 'src/reducers/wallet/settingsReducer';
 import suiteReducer from 'src/reducers/suite/suiteReducer';
-import deviceReducer from 'src/reducers/suite/deviceReducer';
+import { prepareDeviceReducer } from 'src/reducers/suite/deviceReducer';
 import discoveryReducer from 'src/reducers/wallet/discoveryReducer';
 import sendFormReducer from 'src/reducers/wallet/sendFormReducer';
 import graphReducer from 'src/reducers/wallet/graphReducer';
 import storageMiddleware from 'src/middlewares/wallet/storageMiddleware';
 import { coinjoinReducer } from 'src/reducers/wallet/coinjoinReducer';
-import { getAccountTransactions, getAccountIdentifier } from '@suite-common/wallet-utils';
 import { AppState } from 'src/types/suite';
 import { SETTINGS } from 'src/config/suite';
 import { preloadStore } from 'src/support/suite/preloadStore';
+import { extraDependencies } from 'src/support/extraDependencies';
+
+import { getAccountTransactions, getAccountIdentifier } from '@suite-common/wallet-utils';
+import { disableAccountsThunk, transactionsActions } from '@suite-common/wallet-core';
+
+import * as suiteActions from '../suiteActions';
+import * as storageActions from '../storageActions';
 
 const { getSuiteDevice, getWalletAccount, getWalletTransaction } = global.JestMocks;
+
+const deviceReducer = prepareDeviceReducer(extraDependencies);
 
 // TODO: add method in suite-storage for deleting all stored data (done as a static method on SuiteDB), call it after each test
 // TODO: test deleting device instances on parent device forget

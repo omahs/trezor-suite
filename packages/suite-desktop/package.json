@@ -20,14 +20,9 @@
         "build:linux": "yarn clean && yarn build:ui && yarn build:app --publish never --linux --x64 --arm64",
         "build:mac": "yarn clean && yarn build:ui && yarn build:app --publish never --mac --x64 --arm64",
         "build:win": "yarn clean && yarn build:ui && yarn build:app --publish never --win --x64",
-        "publish:all": "yarn clean && yarn build:ui && yarn build:app:electron --publish always --mac --linux --win",
-        "publish:linux": "yarn build:linux && yarn build:app:electron --publish always --linux",
-        "publish:mac": "yarn build:mac && yarn build:app:electron --publish always --mac",
-        "publish:win": "yarn build:win && yarn build:app:electron --publish always --win",
         "lint:js": "yarn g:eslint '**/*.{ts,tsx,js}'"
     },
     "dependencies": {
-        "@sentry/electron": "^4.6.0",
         "blake-hash": "^2.0.0",
         "electron-localshortcut": "^3.2.1",
         "electron-store": "^8.1.0",

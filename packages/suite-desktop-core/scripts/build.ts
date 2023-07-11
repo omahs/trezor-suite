@@ -1,16 +1,12 @@
-/* eslint-disable no-console */
+/* eslint-disable no-console, @typescript-eslint/no-var-requires */
 import fs from 'fs';
 import path from 'path';
 import childProcess from 'child_process';
 import { sync } from 'glob';
 import { build, PluginBuild } from 'esbuild';
 
-import uriSchemes from '../../suite-desktop/uriSchemes.json';
-
+const uriSchemes = require('../../suite-desktop/uriSchemes.json');
 const pkg = require('../../suite-desktop/package.json');
-
-// To prevent unnecessary type check of whole suite package. It's a static file so require is
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 const { suiteVersion } = require('../../suite/package.json');
 
 const { NODE_ENV, USE_MOCKS, IS_CODESIGN_BUILD } = process.env;
@@ -69,8 +65,6 @@ const dependencies = Object.keys(pkg.dependencies);
 const devDependencies = Object.keys(pkg.devDependencies);
 
 const electronExternalDependencies = [...dependencies, ...devDependencies];
-
-// TODO: maybe desktop-api could be built too?
 
 build({
     entryPoints: ['app.ts', 'preload.ts', ...modules, ...threads].map(f => path.join(source, f)),

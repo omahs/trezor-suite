@@ -5,7 +5,7 @@ import childProcess from 'child_process';
 import { sync } from 'glob';
 import { build, PluginBuild } from 'esbuild';
 
-import uriSchemes from '../uriSchemes.json';
+import uriSchemes from '../../suite-desktop/uriSchemes.json';
 
 const pkg = require('../../suite-desktop/package.json');
 

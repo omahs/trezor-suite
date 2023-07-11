@@ -8480,6 +8480,7 @@ __metadata:
   dependencies:
     "@electron/notarize": 1.2.4
     "@sentry/electron": ^4.6.0
+    blake-hash: ^2.0.0
     electron: 24.5.1
     electron-builder: 23.6.0
     electron-localshortcut: ^3.2.1

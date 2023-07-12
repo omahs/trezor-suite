@@ -48,10 +48,20 @@ export const parseConnectSettings = (input: Partial<ConnectSettings> = {}): Conn
     if (typeof window !== 'undefined' && typeof window.location?.search === 'string') {
         const vars = window.location.search.split('&');
         const customUrl = vars.find(v => v.indexOf('trezor-connect-src') >= 0);
+        const trustIssues = vars.find(v => v.includes('trust-issues'));
+
         if (customUrl) {
             const [, connectSrc] = customUrl.split('=');
             settings.connectSrc = decodeURIComponent(connectSrc);
             settings.debug = true;
+        }
+
+        if (trustIssues) {
+            const [, value] = trustIssues.split('=');
+            console.log('value', value);
+            if (value === 'true') {
+                settings.trustedHost = false;
+            }
         }
     }
 

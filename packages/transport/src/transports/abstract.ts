@@ -86,10 +86,6 @@ export abstract class AbstractTransport extends TypedEmitter<{
      */
     protected listenPromise: Record<string, Deferred<string>> = {};
 
-    /**
-     * used to postpone resolving of transport.release until next descriptors are delivered
-     */
-    protected releasePromise?: Deferred<any>;
     protected releasingSession: string | undefined;
 
     /**
@@ -367,7 +363,7 @@ export abstract class AbstractTransport extends TypedEmitter<{
         this.logger.debug('nextDescriptors', nextDescriptors, 'diff', diff);
 
         this.descriptors = nextDescriptors;
-
+        console.log('==nextDescriptors', JSON.stringify(nextDescriptors, null, 2));
         if (diff.didUpdate) {
             Object.keys(this.listenPromise).forEach(path => {
                 const descriptor = nextDescriptors.find(device => device.path === path);
@@ -393,9 +389,6 @@ export abstract class AbstractTransport extends TypedEmitter<{
                 }
             });
 
-            if (this.releasePromise) {
-                this.releasePromise.resolve(undefined);
-            }
             this.emit(TRANSPORT.UPDATE, diff);
             this.releasingSession = undefined;
         }

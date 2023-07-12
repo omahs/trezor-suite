@@ -201,9 +201,12 @@ export class Device extends TypedEmitter<DeviceEvents> {
             if (this.releasePromise) {
                 await this.releasePromise;
             }
+            console.log('device.release => transport.release()');
             this.releasePromise = this.transport.release(this.activitySessionID, false);
 
             const releaseResponse = await this.releasePromise.promise;
+            console.log('device.release res', releaseResponse);
+
             this.releasePromise = undefined;
             if (releaseResponse.success) {
                 this.activitySessionID = null;
@@ -216,6 +219,7 @@ export class Device extends TypedEmitter<DeviceEvents> {
         this.removeAllListeners();
         // make sure that Device_CallInProgress will not be thrown
         this.runPromise = null;
+        console.log('device cleanup => this.release()');
         await this.release();
     }
 
@@ -364,6 +368,7 @@ export class Device extends TypedEmitter<DeviceEvents> {
             options.keepSession === false
         ) {
             this.keepSession = false;
+            console.log('device runInner => this.release(0');
             await this.release();
         }
 
@@ -641,6 +646,7 @@ export class Device extends TypedEmitter<DeviceEvents> {
                     this.commands.cancel();
                 }
 
+                console.log('device.dispose --> transport.release()');
                 return this.transport.release(this.activitySessionID, true);
             } catch (err) {
                 // empty

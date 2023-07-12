@@ -141,7 +141,6 @@ export abstract class AbstractUsbTransport extends AbstractTransport {
         return this.scheduleAction(async () => {
             if (this.listening) {
                 this.releasingSession = session;
-                this.releasePromise = createDeferred();
             }
 
             const releaseIntentResponse = await this.sessionsClient.releaseIntent({
@@ -157,10 +156,6 @@ export abstract class AbstractUsbTransport extends AbstractTransport {
                 path: releaseIntentResponse.payload.path,
             });
 
-            if (this.releasePromise?.promise) {
-                await this.releasePromise.promise;
-                delete this.releasePromise;
-            }
             return this.success(undefined);
         });
     }

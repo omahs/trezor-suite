@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { versionUtils, createTimeoutPromise, createDeferred, Deferred } from '@trezor/utils';
 
 import { bridgeApiCall } from '../utils/bridgeApiCall';
@@ -107,28 +108,37 @@ export class BridgeTransport extends AbstractTransport {
 
     private async _listen(): Promise<void> {
         if (this.stopped) {
+            console.log('_listen stoppedd');
             return;
         }
         const listenTimestamp = new Date().getTime();
+
+        console.log('-- listen again!');
 
         const response = await this._post('/listen', {
             body: this.descriptors,
             signal: this.abortController.signal,
         });
 
+        console.log('-- listResnponse', response);
+
         if (!response.success) {
-            const time = new Date().getTime() - listenTimestamp;
-            if (time > 1100) {
-                await createTimeoutPromise(1000);
-                return this._listen();
-            }
-            this.emit('transport-error', response.error);
-            return;
+            // const time = new Date().getTime() - listenTimestamp;
+            // if (time > 1100) {
+            //     await createTimeoutPromise(1000);
+
+            return this._listen();
+            // }
+            // this.emit('transport-error', response.error);
+            // return;
         }
 
         if (this.acquirePromise?.promise) {
+            console.log('-- listen waiting for acquire promise');
             await this.acquirePromise.promise;
+            console.log('-- listen waiting for acquire promise done');
         }
+
         this.handleDescriptorsChange(response.payload);
         return this._listen();
     }
@@ -185,12 +195,7 @@ export class BridgeTransport extends AbstractTransport {
     // https://github.dev/trezor/trezord-go/blob/f559ee5079679aeb5f897c65318d3310f78223ca/core/core.go#L354
     public release(session: string, onclose?: boolean) {
         return this.scheduleAction(async signal => {
-            if (this.listening) {
-                this.releasingSession = session;
-                this.releasePromise = createDeferred();
-            }
-
-            this._post('/release', {
+            const releasePromise = this._post('/release', {
                 params: session,
                 signal,
             });
@@ -202,10 +207,7 @@ export class BridgeTransport extends AbstractTransport {
                 return this.success(undefined);
             }
 
-            if (this.releasePromise?.promise) {
-                await this.releasePromise.promise;
-                delete this.releasePromise;
-            }
+            await releasePromise;
 
             return this.success(undefined);
         });

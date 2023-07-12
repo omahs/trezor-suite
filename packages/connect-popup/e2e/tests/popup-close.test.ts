@@ -2,7 +2,8 @@ import { test, expect, Page } from '@playwright/test';
 import { TrezorUserEnvLink } from '@trezor/trezor-user-env-link';
 import { createDeferred, Deferred } from '@trezor/utils';
 
-const url = process.env.URL || 'http://localhost:8088/';
+// todo: remove trust issues && remove clicking on approve permissions && test permissions in a separate test => profit
+const url = `${process.env.URL || 'http://localhost:8088/'}?trust-issues=true`;
 
 const WAIT_AFTER_TEST = 3000; // how long test should wait for more potential trezord requests
 

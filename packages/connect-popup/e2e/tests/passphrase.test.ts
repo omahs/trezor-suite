@@ -2,7 +2,8 @@ import { test, Page } from '@playwright/test';
 import { TrezorUserEnvLink } from '@trezor/trezor-user-env-link';
 import { findElementByDataTest, waitAndClick } from '../support/helpers';
 
-const url = process.env.URL || 'http://localhost:8088/';
+// todo: remove trust issues && remove clicking on approve permissions && test permissions in a separate test => profit
+const url = `${process.env.URL || 'http://localhost:8088/'}?trust-issues=true`;
 const bridgeVersion = '2.0.31';
 
 test.beforeAll(async () => {

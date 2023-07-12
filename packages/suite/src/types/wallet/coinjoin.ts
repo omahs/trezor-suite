@@ -3,7 +3,7 @@ import { PartialRecord } from '@trezor/type-utils';
 
 // @trezor/coinjoin package is meant to be imported dynamically
 // importing types is safe, but importing an enum thru index will bundle whole lib
-import { RegisterAccountParams, CoinjoinPrisonInmate } from '@trezor/coinjoin';
+import { RegisterAccountParams, CoinjoinPrisonInmate, CoinjoinStatusEvent } from '@trezor/coinjoin';
 import {
     RoundPhase,
     SessionPhase,
@@ -25,6 +25,15 @@ export interface CoinjoinSessionParameters {
     skipRounds?: [number, number];
     maxFeePerKvbyte: number;
     maxCoordinatorFeeRate: number;
+}
+
+export interface CoinjoinClientInstance
+    extends Pick<
+        CoinjoinStatusEvent,
+        'coordinationFeeRate' | 'allowedInputAmounts' | 'feeRateMedian' | 'version'
+    > {
+    rounds: { id: string; phase: RoundPhase }[]; // store only slice of Round in reducer. may be extended in the future
+    status: 'loading' | 'loaded';
 }
 
 export interface CoinjoinSession extends CoinjoinSessionParameters {

@@ -9,6 +9,10 @@ export interface CoinjoinStatusEvent {
     feeRateMedian: number;
     coordinationFeeRate: CoordinationFeeRate;
     allowedInputAmounts: AllowedRange;
+    version?: {
+        majorVersion: string;
+        commitHash: string;
+    };
 }
 
 export interface CoinjoinClientEvents {

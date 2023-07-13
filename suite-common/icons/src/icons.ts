@@ -15,6 +15,7 @@ export const icons = {
     biometric: require('../assets/icons/biometric.svg'),
     bugBeetle: require('../assets/icons/bugBeetle.svg'),
     calendar: require('../assets/icons/calendar.svg'),
+    change: require('../assets/icons/change.svg'),
     check: require('../assets/icons/check.svg'),
     chevronDown: require('../assets/icons/chevronDown.svg'),
     chevronLeft: require('../assets/icons/chevronLeft.svg'),
@@ -112,6 +113,11 @@ export const cryptoIcons = {
 } as const;
 export type CryptoIconName = keyof typeof cryptoIcons;
 
+export const flagIcons = {
+    cz: require('../assets/flags/cz.svg'),
+} as const;
+export type FlagIconName = keyof typeof flagIcons;
+
 export const tokenIcons = {
     '0xa0b73e1ff0b80914ab6fe0444e65848c4c34450b': require('../assets/tokenIcons/cro.svg'),
     '0x6b175474e89094c44da98b954eedeac495271d0f': require('../assets/tokenIcons/dai.svg'),
@@ -128,8 +134,3 @@ export type TokenIconName = keyof typeof tokenIcons;
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 export const genericTokenIcon = require('../assets/tokenIcons/erc20.svg');
-
-export const flagIcons = {
-    cz: require('../assets/flags/cz.svg'),
-} as const;
-export type FlagIconName = keyof typeof flagIcons;

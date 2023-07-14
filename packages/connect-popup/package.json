@@ -19,7 +19,8 @@
         "@trezor/crypto-utils": "workspace:*",
         "@trezor/urls": "workspace:*",
         "eth-phishing-detect": "^1.2.0",
-        "react-dom": "18.2.0"
+        "react-dom": "18.2.0",
+        "react-inspector": "^6.0.2"
     },
     "devDependencies": {
         "@playwright/test": "^1.35.1",

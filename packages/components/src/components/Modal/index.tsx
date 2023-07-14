@@ -12,6 +12,7 @@ import { Progress } from '../loaders/Progress';
 
 const CLOSE_ICON_SIDE = 26;
 const CLOSE_ICON_PADDING = 16;
+const CONTENT_ID = 'modal-content';
 
 const ModalPromptContainer = styled.div`
     margin-bottom: 25px;
@@ -303,7 +304,7 @@ const Modal = ({
 
                 <Body>
                     {description && <Description>{description}</Description>}
-                    <Content>{children}</Content>
+                    <Content id="modal-content">{children}</Content>
                 </Body>
 
                 {bottomBar && <BottomBar>{bottomBar}</BottomBar>}
@@ -318,6 +319,7 @@ Modal.Description = Description;
 Modal.Content = Content;
 Modal.BottomBar = BottomBar;
 Modal.closeIconWidth = CLOSE_ICON_SIDE + CLOSE_ICON_PADDING;
+Modal.contentId = CONTENT_ID;
 
 export { Modal };
 export type { ModalProps };

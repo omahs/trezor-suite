@@ -26,7 +26,7 @@ import {
     INPUT_BORDER_WIDTH,
     getInputStateTextColor,
 } from '../InputStyles';
-import { Modal } from '../../Modal';
+import { MODAL_CONTENT_ID } from '../../Modal';
 
 const reactSelectClassNamePrefix = 'react-select';
 
@@ -366,8 +366,7 @@ export const Select = ({
         let parent = selectRef.current?.inputRef?.parentElement;
         let count = 0;
         while (parent) {
-            console.log(count);
-            if (parent.id === Modal.contentId) {
+            if (parent.id === MODAL_CONTENT_ID) {
                 setMenuPortalTarget(document.body);
                 break;
             }

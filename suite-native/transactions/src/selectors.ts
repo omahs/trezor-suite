@@ -19,11 +19,11 @@ const selectTransactionTargetAddresses = memoizeWithArgs(
         if (G.isNullable(transaction) || G.isNullable(transactionTargets)) return [];
 
         const isSentTransactionType = transaction.type === 'sent';
-        return mapTransactionInputsOutputsToAddresses(
-            transactionTargets,
-            'outputs',
+        return mapTransactionInputsOutputsToAddresses({
+            inputsOutputs: transactionTargets,
+            addressesType: 'outputs',
             isSentTransactionType,
-        );
+        });
     },
     { size: 50 },
 );
@@ -39,16 +39,16 @@ export const selectTransactionAddresses = memoizeWithArgs(
 
         if (G.isNullable(transaction)) return [];
 
-        const inputsOrOutputs =
+        const inputsOutputs =
             addressesType === 'inputs' ? transaction.details.vin : transaction.details.vout;
 
         const isSentTransactionType = transaction.type === 'sent';
 
-        const addresses = mapTransactionInputsOutputsToAddresses(
-            inputsOrOutputs,
+        const addresses = mapTransactionInputsOutputsToAddresses({
+            inputsOutputs,
             addressesType,
             isSentTransactionType,
-        );
+        });
 
         const targetAddresses = selectTransactionTargetAddresses(state, txid, accountKey);
 

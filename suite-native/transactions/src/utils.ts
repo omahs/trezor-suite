@@ -4,11 +4,15 @@ import { EnhancedVinVout, Target } from '@trezor/blockchain-link-types';
 
 import { VinVoutAddress, AddressesType } from './types';
 
-export const mapTransactionInputsOutputsToAddresses = (
-    inputsOutputs: EnhancedVinVout[] | Target[],
-    addressesType: AddressesType,
-    isSentTransactionType: boolean,
-) =>
+export const mapTransactionInputsOutputsToAddresses = ({
+    inputsOutputs,
+    addressesType,
+    isSentTransactionType,
+}: {
+    inputsOutputs: EnhancedVinVout[] | Target[];
+    addressesType: AddressesType;
+    isSentTransactionType: boolean;
+}) =>
     pipe(
         inputsOutputs,
         A.map(target => {

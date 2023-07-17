@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
@@ -86,8 +86,13 @@ export const TransactionDetailAddressesSheet = ({
     const displayedAddresses =
         displayedAddressesType === 'inputs' ? inputAddresses : outputAddresses;
 
-    const targetAddresses = displayedAddresses.filter(({ isChangeAddress }) => !isChangeAddress);
-    const changeAddresses = displayedAddresses.filter(({ isChangeAddress }) => isChangeAddress);
+    const { targetAddresses, changeAddresses } = useMemo(
+        () => ({
+            targetAddresses: displayedAddresses.filter(({ isChangeAddress }) => !isChangeAddress),
+            changeAddresses: displayedAddresses.filter(({ isChangeAddress }) => isChangeAddress),
+        }),
+        [displayedAddresses],
+    );
 
     const toggleAddresses = () => {
         setDisplayedAddressesType(displayedAddressesType === 'inputs' ? 'outputs' : 'inputs');

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
 import { Box, Divider, Text } from '@suite-native/atoms';
@@ -81,8 +81,13 @@ export const TransactionDetailAddressesSection = ({
 }: TransactionDetailAddressesSectionProps) => {
     const { applyStyle } = useNativeStyles();
 
-    const targetAddresses = addresses.filter(({ isChangeAddress }) => !isChangeAddress);
-    const changeAddresses = addresses.filter(({ isChangeAddress }) => isChangeAddress);
+    const { targetAddresses, changeAddresses } = useMemo(
+        () => ({
+            targetAddresses: addresses.filter(({ isChangeAddress }) => !isChangeAddress),
+            changeAddresses: addresses.filter(({ isChangeAddress }) => isChangeAddress),
+        }),
+        [addresses],
+    );
 
     const formattedTitle = formatAddressLabel(addressesType, targetAddresses.length);
 

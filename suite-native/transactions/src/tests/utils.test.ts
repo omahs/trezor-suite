@@ -7,7 +7,13 @@ import {
 
 describe('mapTransactionInputsOutputsToAddresses', () => {
     test('should return an empty array when input is empty', () => {
-        expect(mapTransactionInputsOutputsToAddresses([], 'inputs', true)).toEqual([]);
+        expect(
+            mapTransactionInputsOutputsToAddresses({
+                inputsOutputs: [],
+                addressesType: 'inputs',
+                isSentTransactionType: true,
+            }),
+        ).toEqual([]);
     });
 
     test('should return correct concatenated non-null addresses for transaction inputs', () => {
@@ -16,11 +22,11 @@ describe('mapTransactionInputsOutputsToAddresses', () => {
             { address: 'bc346cd7c787e903ac4b41e4fd2e038a81cb696d5dbf87', isChangeAddress: false },
         ];
         expect(
-            mapTransactionInputsOutputsToAddresses(
-                transactionWithTargetInOutputs.details.vin,
-                'inputs',
-                false,
-            ),
+            mapTransactionInputsOutputsToAddresses({
+                inputsOutputs: transactionWithTargetInOutputs.details.vin,
+                addressesType: 'inputs',
+                isSentTransactionType: false,
+            }),
         ).toEqual(expectedOutput);
     });
 
@@ -30,11 +36,11 @@ describe('mapTransactionInputsOutputsToAddresses', () => {
             { address: '3QpCQP3A2q7kCr8QgsWuqG1Bg1P6RySonw', isChangeAddress: false },
         ];
         expect(
-            mapTransactionInputsOutputsToAddresses(
-                transactionWithTargetInOutputs.details.vout,
-                'outputs',
-                false,
-            ),
+            mapTransactionInputsOutputsToAddresses({
+                inputsOutputs: transactionWithTargetInOutputs.details.vout,
+                addressesType: 'outputs',
+                isSentTransactionType: false,
+            }),
         ).toEqual(expectedOutput);
     });
 });
@@ -45,36 +51,36 @@ describe('sortTargetAddressesToBeginning', () => {
     });
 
     test('should return empty array if only targets are present', () => {
-        const targetAddresses = mapTransactionInputsOutputsToAddresses(
-            transactionWithTargetInOutputs.targets,
-            'outputs',
-            false,
-        );
+        const targetAddresses = mapTransactionInputsOutputsToAddresses({
+            inputsOutputs: transactionWithTargetInOutputs.targets,
+            addressesType: 'outputs',
+            isSentTransactionType: false,
+        });
 
         expect(sortTargetAddressesToBeginning([], targetAddresses)).toEqual([]);
     });
 
     test('should return unchanged transaction inputs if targets not present', () => {
-        const inputAddresses = mapTransactionInputsOutputsToAddresses(
-            transactionWithTargetInOutputs.details.vin,
-            'inputs',
-            true,
-        );
+        const inputAddresses = mapTransactionInputsOutputsToAddresses({
+            inputsOutputs: transactionWithTargetInOutputs.details.vin,
+            addressesType: 'inputs',
+            isSentTransactionType: true,
+        });
 
         expect(sortTargetAddressesToBeginning(inputAddresses, [])).toEqual(inputAddresses);
     });
 
     test('should return unchanged transaction inputs if targets are not included', () => {
-        const inputAddresses = mapTransactionInputsOutputsToAddresses(
-            transactionWithTargetInOutputs.details.vin,
-            'inputs',
-            false,
-        );
-        const targetAddresses = mapTransactionInputsOutputsToAddresses(
-            transactionWithTargetInOutputs.targets,
-            'outputs',
-            false,
-        );
+        const inputAddresses = mapTransactionInputsOutputsToAddresses({
+            inputsOutputs: transactionWithTargetInOutputs.details.vin,
+            addressesType: 'inputs',
+            isSentTransactionType: false,
+        });
+        const targetAddresses = mapTransactionInputsOutputsToAddresses({
+            inputsOutputs: transactionWithTargetInOutputs.targets,
+            addressesType: 'outputs',
+            isSentTransactionType: false,
+        });
 
         expect(sortTargetAddressesToBeginning(inputAddresses, targetAddresses)).toEqual(
             inputAddresses,
@@ -82,16 +88,16 @@ describe('sortTargetAddressesToBeginning', () => {
     });
 
     test('should targets at the beginning of the array', () => {
-        const outputAddresses = mapTransactionInputsOutputsToAddresses(
-            transactionWithTargetInOutputs.details.vout,
-            'outputs',
-            false,
-        );
-        const targetAddresses = mapTransactionInputsOutputsToAddresses(
-            transactionWithTargetInOutputs.targets,
-            'outputs',
-            false,
-        );
+        const outputAddresses = mapTransactionInputsOutputsToAddresses({
+            inputsOutputs: transactionWithTargetInOutputs.details.vout,
+            addressesType: 'outputs',
+            isSentTransactionType: false,
+        });
+        const targetAddresses = mapTransactionInputsOutputsToAddresses({
+            inputsOutputs: transactionWithTargetInOutputs.targets,
+            addressesType: 'outputs',
+            isSentTransactionType: false,
+        });
 
         const expectedResult: VinVoutAddress[] = [
             { address: '3QpCQP3A2q7kCr8QgsWuqG1Bg1P6RySonw', isChangeAddress: false },
@@ -104,16 +110,16 @@ describe('sortTargetAddressesToBeginning', () => {
     });
 
     test('identify change address of a sent transaction', () => {
-        const outputAddresses = mapTransactionInputsOutputsToAddresses(
-            transactionWithChangeAddress.details.vout,
-            'outputs',
-            true,
-        );
-        const targetAddresses = mapTransactionInputsOutputsToAddresses(
-            transactionWithChangeAddress.targets,
-            'outputs',
-            true,
-        );
+        const outputAddresses = mapTransactionInputsOutputsToAddresses({
+            inputsOutputs: transactionWithChangeAddress.details.vout,
+            addressesType: 'outputs',
+            isSentTransactionType: true,
+        });
+        const targetAddresses = mapTransactionInputsOutputsToAddresses({
+            inputsOutputs: transactionWithChangeAddress.targets,
+            addressesType: 'outputs',
+            isSentTransactionType: true,
+        });
 
         const expectedResult: VinVoutAddress[] = [
             { address: 'bc1ql2ntmq4jlq5g2q53q89c7f7d27s35se96jq6kw', isChangeAddress: false },

@@ -11,7 +11,7 @@ import { TransactionsRootState } from '@suite-common/wallet-core';
 import { SettingsSliceRootState } from '@suite-native/module-settings';
 
 import { TransactionDetailSheet } from './TransactionDetailSheet';
-import { selectTransactionInputAndOutputTransfers } from '../../selectors';
+import { selectTransactionInputAndOutputTransfers, TransactionTranfer } from '../../selectors';
 import { TransactionDetailInputsSheetSection } from './TransactionDetailInputsSheetSection';
 
 type TransactionDetailInputsSheetProps = {
@@ -21,16 +21,16 @@ type TransactionDetailInputsSheetProps = {
     onSheetVisibilityChange: () => void;
 };
 
-type InputsOutputsMainHeader = {
-    inputsCounts: number;
+type InputsOutputsHeaderProps = {
+    inputsCount: number;
     outputsCount: number;
 };
 
-const InputsOutputsMainHeader = ({ inputsCounts, outputsCount }: InputsOutputsMainHeader) => (
+const InputsOutputsHeader = ({ inputsCount, outputsCount }: InputsOutputsHeaderProps) => (
     <Box flexDirection="row" justifyContent="space-between" marginBottom="medium">
         <Box flex={1} flexDirection="row" alignItems="center" paddingLeft="small">
             <Text variant="hint" color="textSubdued">
-                Inputs · {inputsCounts}
+                Inputs · {inputsCount}
             </Text>
             <Box marginLeft="small">
                 <Icon name="receiveAlt" color="iconSubdued" size="medium" />
@@ -48,6 +48,16 @@ const InputsOutputsMainHeader = ({ inputsCounts, outputsCount }: InputsOutputsMa
     </Box>
 );
 
+const getTransactionInputsAndOutputsCount = (transfers: TransactionTranfer[]) =>
+    transfers.reduce(
+        (accumulator, { inputs, outputs }) => {
+            accumulator.inputsCount += inputs.length;
+            accumulator.outputsCount += outputs.length;
+            return accumulator;
+        },
+        { inputsCount: 0, outputsCount: 0 },
+    );
+
 export const TransactionDetailInputsSheet = ({
     isVisible,
     onSheetVisibilityChange,
@@ -61,8 +71,7 @@ export const TransactionDetailInputsSheet = ({
 
     if (G.isNull(transactionTransfers)) return null;
     const { externalTransfers, internalTransfers, tokenTransfers } = transactionTransfers;
-    const inputsCount = externalTransfers.reduce((sum, { inputs }) => sum + inputs.length, 0);
-    const outputsCount = externalTransfers.reduce((sum, { outputs }) => sum + outputs.length, 0);
+    const { inputsCount, outputsCount } = getTransactionInputsAndOutputsCount(externalTransfers);
 
     return (
         <TransactionDetailSheet
@@ -75,8 +84,8 @@ export const TransactionDetailInputsSheet = ({
             <VStack>
                 <TransactionDetailInputsSheetSection
                     header={
-                        <InputsOutputsMainHeader
-                            inputsCounts={inputsCount}
+                        <InputsOutputsHeader
+                            inputsCount={inputsCount}
                             outputsCount={outputsCount}
                         />
                     }

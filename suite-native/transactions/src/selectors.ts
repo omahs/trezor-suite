@@ -74,11 +74,11 @@ export const selectTransactionInputAndOutputTransfers = memoizeWithArgs(
         const externalTransfers: TransactionTranfer[] = [
             {
                 inputs: transaction.details.vin.map(input => ({
-                    address: input.addresses![0],
+                    address: input.addresses?.[0] ?? '',
                     amount: input.value,
                 })),
                 outputs: transaction.details.vout.map(output => ({
-                    address: output.addresses![0],
+                    address: output.addresses?.[0] ?? '',
                     amount: output.value,
                 })),
                 symbol: transaction.symbol,

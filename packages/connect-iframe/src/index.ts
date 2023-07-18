@@ -24,23 +24,15 @@ import {
 import { Core, initCore, initTransport } from '@trezor/connect/src/core';
 import { DataManager } from '@trezor/connect/src/data/DataManager';
 import { config } from '@trezor/connect/src/data/config';
-import { LogWriter, initLog } from '@trezor/connect/src/utils/debug';
+import { initLog } from '@trezor/connect/src/utils/debug';
 import { getOrigin } from '@trezor/connect/src/utils/urlUtils';
 import { suggestBridgeInstaller } from '@trezor/connect/src/data/transportInfo';
 import { suggestUdevInstaller } from '@trezor/connect/src/data/udevInfo';
 import { storage, getSystemInfo, getInstallerPackage } from '@trezor/connect-common';
 import { parseConnectSettings, isOriginWhitelisted } from './connectSettings';
-// @ts-expect-error (typescript does not know this is worker constructor, this is done by webpack)
-import LogWorker from './sharedLoggerWorker';
+import { logWriter } from './logWriter';
 
 let _core: Core | undefined;
-
-const logWorker = new LogWorker();
-logWorker.port.start();
-
-const logWriter = (): LogWriter => ({
-    add: (message: object) => logWorker.port.postMessage({ type: 'add-log', data: message }),
-});
 
 // custom log
 const _log = initLog('IFrame');

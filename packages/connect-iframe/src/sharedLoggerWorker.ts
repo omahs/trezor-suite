@@ -9,7 +9,7 @@ interface LogEntry {
     data: any;
 }
 
-const MAX_ENTRIES = 100;
+const MAX_ENTRIES = 1000;
 
 function handleMessage(event: MessageEvent<LogEntry>, port: MessagePort) {
     const { type, data } = event;

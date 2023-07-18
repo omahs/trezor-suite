@@ -9,11 +9,16 @@ interface LogEntry {
     data: any;
 }
 
+const MAX_ENTRIES = 100;
+
 function handleMessage(event: MessageEvent<LogEntry>, port: MessagePort) {
     const { type, data } = event;
     switch (type) {
         case 'add-log':
             messages.push(data);
+            if (messages.length > MAX_ENTRIES) {
+                messages.shift();
+            }
             if (subscriberPorts.length > 0) {
                 subscriberPorts.forEach(subscriberPort => {
                     subscriberPort.postMessage({ type: 'log-entry', payload: data });

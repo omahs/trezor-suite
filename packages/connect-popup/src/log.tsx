@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client';
 
 import { ObjectInspector } from 'react-inspector';
 
-const MAX_ENTRIES = 100;
+const MAX_ENTRIES = 1000;
 
 const DownloadButton = ({ array, filename }: { array: any[]; filename: string }) => {
     const buttonStyle = {

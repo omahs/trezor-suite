@@ -3,6 +3,8 @@ import { createRoot } from 'react-dom/client';
 
 import { ObjectInspector } from 'react-inspector';
 
+const MAX_ENTRIES = 100;
+
 const DownloadButton = ({ array, filename }: { array: any[]; filename: string }) => {
     const buttonStyle = {
         backgroundColor: '#01b757',
@@ -46,14 +48,18 @@ const useLogWorker = (setLogs: React.Dispatch<React.SetStateAction<any[]>>) => {
     const logWorker = new SharedWorker('./workers/shared-logger-worker.js');
     useEffect(() => {
         logWorker.port.onmessage = function (event) {
-            console.log('event', event);
             const { data } = event;
             switch (data.type) {
                 case 'get-logs':
                     setLogs(data.payload);
                     break;
                 case 'log-entry':
-                    setLogs(prevLogs => [...prevLogs, data.payload]);
+                    setLogs(prevLogs => {
+                        if (prevLogs.length > MAX_ENTRIES) {
+                            prevLogs.shift();
+                        }
+                        return [...prevLogs, data.payload];
+                    });
                     break;
                 default:
             }
@@ -88,22 +94,8 @@ const App = () => (
 );
 
 const renderUI = () => {
-    const reactSlot = document.getElementById('log-react');
-
-    if (!reactSlot!.shadowRoot) {
-        reactSlot!.attachShadow({ mode: 'open' });
-    }
-
-    const reactRenderIn = document.createElement('div');
-    reactRenderIn.setAttribute('id', 'reactRenderIn');
-    reactRenderIn.style.display = 'flex';
-    reactRenderIn.style.flexDirection = 'column';
-    reactRenderIn.style.flex = '1';
-
-    // append the renderIn element inside the styleSlot
-    reactSlot!.shadowRoot!.appendChild(reactRenderIn);
-
-    const root = createRoot(reactRenderIn);
+    const logReact = document.getElementById('log-react');
+    const root = createRoot(logReact!);
     const Component = <App />;
 
     root.render(Component);

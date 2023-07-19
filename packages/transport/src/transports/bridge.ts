@@ -146,12 +146,7 @@ export class BridgeTransport extends AbstractTransport {
 
                 if (this.listening) {
                     // listenPromise is resolved on next listen
-                    this.listenPromise[input.path] = createDeferred<string>();
-                    this.listenPromise[input.path].promise
-                        .catch(err => err)
-                        .finally(() => {
-                            delete this.listenPromise[input.path];
-                        });
+                    this.listenPromise[input.path] = createDeferred();
                 }
 
                 const response = await this._post('/acquire', {
@@ -174,9 +169,9 @@ export class BridgeTransport extends AbstractTransport {
                     return this.success(response.payload);
                 }
 
-                return this.listenPromise[input.path].promise.then(sessionConfirmedByListen =>
-                    this.success(sessionConfirmedByListen),
-                );
+                return this.listenPromise[input.path].promise.finally(() => {
+                    delete this.listenPromise[input.path];
+                });
             },
             undefined,
             [ERRORS.DEVICE_DISCONNECTED_DURING_ACTION, ERRORS.SESSION_WRONG_PREVIOUS],

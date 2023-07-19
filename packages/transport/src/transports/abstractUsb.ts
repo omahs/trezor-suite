@@ -90,12 +90,7 @@ export abstract class AbstractUsbTransport extends AbstractTransport {
                 const { path } = input;
 
                 if (this.listening) {
-                    this.listenPromise[path] = createDeferred<string>();
-                    this.listenPromise[path].promise
-                        .catch(err => err)
-                        .finally(() => {
-                            delete this.listenPromise[path];
-                        });
+                    this.listenPromise[path] = createDeferred();
                 }
 
                 const acquireIntentResponse = await this.sessionsClient.acquireIntent(input);
@@ -114,7 +109,7 @@ export abstract class AbstractUsbTransport extends AbstractTransport {
 
                 if (!openDeviceResult.success) {
                     if (this.listenPromise) {
-                        this.listenPromise[path].reject(new Error(openDeviceResult.error));
+                        this.listenPromise[path].resolve(openDeviceResult);
                     }
                     return openDeviceResult;
                 }
@@ -129,7 +124,9 @@ export abstract class AbstractUsbTransport extends AbstractTransport {
                     return this.success(acquireIntentResponse.payload.session);
                 }
 
-                return this.listenPromise[path].promise.then(sessionId => this.success(sessionId));
+                return this.listenPromise[path].promise.finally(() => {
+                    delete this.listenPromise[path];
+                });
             },
             undefined,
             [ERRORS.DEVICE_DISCONNECTED_DURING_ACTION, ERRORS.SESSION_WRONG_PREVIOUS],

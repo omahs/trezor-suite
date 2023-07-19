@@ -84,7 +84,21 @@ export abstract class AbstractTransport extends TypedEmitter<{
     /**
      * promise that resolves on when next descriptors are delivered
      */
-    protected listenPromise: Record<string, Deferred<string>> = {};
+    protected listenPromise: Record<
+        string,
+        Deferred<
+            ResultWithTypedError<
+                string,
+                | typeof ERRORS.DEVICE_DISCONNECTED_DURING_ACTION
+                | typeof ERRORS.SESSION_WRONG_PREVIOUS
+                | typeof ERRORS.DEVICE_NOT_FOUND
+                | typeof ERRORS.INTERFACE_UNABLE_TO_OPEN_DEVICE
+                | typeof ERRORS.UNEXPECTED_ERROR
+                | typeof ERRORS.ABORTED_BY_TIMEOUT
+                | typeof ERRORS.ABORTED_BY_SIGNAL
+            >
+        >
+    > = {};
 
     /**
      * used to postpone resolving of transport.release until next descriptors are delivered
@@ -373,8 +387,8 @@ export abstract class AbstractTransport extends TypedEmitter<{
                 const descriptor = nextDescriptors.find(device => device.path === path);
 
                 if (!descriptor) {
-                    return this.listenPromise[path].reject(
-                        new Error(ERRORS.DEVICE_DISCONNECTED_DURING_ACTION),
+                    return this.listenPromise[path].resolve(
+                        this.error({ error: ERRORS.DEVICE_DISCONNECTED_DURING_ACTION }),
                     );
                 }
 
@@ -382,11 +396,11 @@ export abstract class AbstractTransport extends TypedEmitter<{
                     const reportedNextSession = descriptor.session;
                     if (reportedNextSession === this.acquiredUnconfirmed[descriptor.path]) {
                         this.listenPromise[descriptor.path].resolve(
-                            this.acquiredUnconfirmed[descriptor.path]!,
+                            this.success(this.acquiredUnconfirmed[descriptor.path]!),
                         );
                     } else {
-                        this.listenPromise[descriptor.path].reject(
-                            new Error(ERRORS.SESSION_WRONG_PREVIOUS),
+                        this.listenPromise[descriptor.path].resolve(
+                            this.error({ error: ERRORS.SESSION_WRONG_PREVIOUS }),
                         );
                     }
                     delete this.acquiredUnconfirmed[descriptor.path];
